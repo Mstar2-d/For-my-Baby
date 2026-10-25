@@ -1,0 +1,549 @@
+/* ==========================================================================
+   DEAR YOU: love letters
+   Sections:
+     1. Colors and page basics
+     2. Layout and headings
+     3. The paper (writing area)
+     4. Buttons
+     5. Saved letters list
+     6. Wax seal animation
+     7. Login page
+     8. Reader page
+     9. Print and small screens
+   ========================================================================== */
+
+
+/* ==========================================================================
+   1. COLORS AND PAGE BASICS
+   Change the colors here and the whole site updates.
+   ========================================================================== */
+
+:root {
+  /* Page */
+  --bg:       #2a1630;   /* main background (deep plum) */
+  --bg-glow:  #3b1d3f;   /* lighter glow at the top of the page */
+  --text:     #f6e6e8;   /* text on the dark background */
+  --card:     #4a2650;   /* list items and the login box */
+
+  /* Paper */
+  --paper:    #fbf3ee;   /* the letter paper */
+  --ink:      #2b2350;   /* handwriting color */
+  --line:     #e7d2cf;   /* ruled lines on the paper */
+  --muted:    #8b6f78;   /* soft labels like "My dearest" */
+
+  /* Accents */
+  --seal:     #9e1b32;   /* wax seal and main button */
+  --seal-light: #c9304a; /* hover and focus color */
+
+  color-scheme: light dark;
+}
+
+/* Slightly darker colors if the device is in dark mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:      #1a0e20;
+    --bg-glow: #27132d;
+    --paper:   #f0e4de;
+    --card:    #33193a;
+  }
+}
+
+/* Keeps content clear of phone notches and system bars */
+html {
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  scroll-padding-top: env(safe-area-inset-top, 0px);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: var(--bg);
+  background-image: radial-gradient(1200px 600px at 50% -10%, var(--bg-glow), var(--bg));
+  color: var(--text);
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 18px;
+}
+
+
+/* ==========================================================================
+   2. LAYOUT AND HEADINGS
+   ========================================================================== */
+
+main {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 28px 18px 64px;
+}
+
+h1 {
+  margin: 8px 0 4px;
+  text-align: center;
+  font-size: clamp(2.2rem, 7vw, 3.4rem);
+  font-style: italic;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+h2 {
+  margin: 44px 0 12px;
+  font-size: 1.7rem;
+  font-style: italic;
+  font-weight: 600;
+}
+
+/* The line under the main title */
+.sub {
+  margin: 0 0 26px;
+  text-align: center;
+  font-style: italic;
+  opacity: 0.8;
+}
+
+/* "Writing as Maryan · Log out" at the top right */
+.who {
+  margin: 0;
+  text-align: right;
+  font-size: 1rem;
+  opacity: 0.85;
+}
+
+.who a {
+  color: var(--text);
+}
+
+/* Small message under the paper, like "Write a few words before sealing" */
+.msg {
+  margin: 8px 0 0;
+  font-family: Caveat, cursive, sans-serif;
+  font-size: 1.3rem;
+  color: var(--seal);
+}
+
+.empty {
+  font-style: italic;
+  opacity: 0.7;
+}
+
+
+/* ==========================================================================
+   3. THE PAPER (WRITING AREA)
+   ========================================================================== */
+
+/* The sheet of paper, tilted a tiny bit */
+.paper {
+  position: relative;
+  padding: 28px 26px 30px;
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: 4px;
+  transform: rotate(-0.4deg);
+  box-shadow:
+    0 30px 60px -20px rgba(0, 0, 0, 0.6),
+    0 2px 0 rgba(255, 255, 255, 0.4) inset;
+}
+
+/* "My dearest Mariah" line */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: baseline;
+  font-family: Caveat, cursive, sans-serif;
+  font-size: 1.7rem;
+}
+
+.row label {
+  color: var(--muted);
+}
+
+/* "Forever yours, Maryan" line */
+.sig {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  margin-top: 14px;
+  font-family: Caveat, cursive, sans-serif;
+  font-size: 1.7rem;
+}
+
+/* Name boxes (they look like handwriting on a dashed line) */
+input[type="text"] {
+  flex: 1 1 140px;
+  min-width: 0;
+  padding: 0 4px;
+  font: inherit;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  border-bottom: 1.5px dashed var(--line);
+}
+
+input[type="text"]:focus,
+textarea:focus {
+  outline: none;
+  border-bottom-color: var(--seal);
+}
+
+/* Today's date, right-aligned */
+.date {
+  margin: 10px 0 0;
+  text-align: right;
+  font-family: Caveat, cursive, sans-serif;
+  font-size: 1.3rem;
+  color: var(--muted);
+}
+
+/* The big writing box. The repeating gradient draws the ruled lines;
+   line-height must match the 42px spacing so text sits on the lines. */
+textarea {
+  display: block;
+  width: 100%;
+  min-height: 380px;
+  margin-top: 6px;
+  padding: 0 2px;
+  resize: vertical;
+  border: 0;
+  background: repeating-linear-gradient(
+    transparent,
+    transparent 41px,
+    var(--line) 41px,
+    var(--line) 42px
+  );
+  background-attachment: local;
+  color: var(--ink);
+  font-family: Caveat, cursive, sans-serif;
+  font-size: 1.65rem;
+  line-height: 42px;
+}
+
+/* Word count under the paper */
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  font-family: Caveat, cursive, sans-serif;
+  font-size: 1.3rem;
+  color: var(--muted);
+}
+
+
+/* ==========================================================================
+   4. BUTTONS
+   ========================================================================== */
+
+/* Row of buttons under the paper */
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin: 22px 0 8px;
+}
+
+button {
+  padding: 10px 18px;
+  font: inherit;
+  font-size: 1rem;
+  color: var(--text);
+  background: transparent;
+  border: 1.5px solid var(--text);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 0.15s, background 0.15s;
+}
+
+button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+/* Main action ("Seal and keep", "Log in") */
+button.primary {
+  font-weight: 600;
+  color: #fff;
+  background: var(--seal);
+  border-color: var(--seal);
+}
+
+button.primary:hover {
+  background: var(--seal-light);
+}
+
+/* Visible outline when using the keyboard */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--seal-light);
+  outline-offset: 3px;
+}
+
+/* Lets the Delete form sit inside a list item without extra spacing */
+.inline {
+  display: inline;
+  margin: 0;
+}
+
+
+/* ==========================================================================
+   5. SAVED LETTERS LIST
+   ========================================================================== */
+
+.shelf {
+  display: grid;
+  gap: 10px;
+}
+
+/* One saved letter */
+.item {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  background: var(--card);
+  border-radius: 8px;
+}
+
+/* Little red wax dot on the left */
+.item .dot {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, var(--seal-light), var(--seal));
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* Title and preview text (clickable) */
+.item .t {
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.item .t b {
+  display: block;
+  font-weight: 600;
+}
+
+.item .t span {
+  display: block;
+  overflow: hidden;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  opacity: 0.7;
+}
+
+.item button {
+  padding: 4px 12px;
+  font-size: 0.9rem;
+}
+
+
+/* ==========================================================================
+   6. WAX SEAL ANIMATION
+   Shown for about 2 seconds after "Seal and keep", then fades away.
+   ========================================================================== */
+
+.seal {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: none;
+  place-items: center;
+  background: rgba(20, 8, 26, 0.7);
+}
+
+/* "auto" is added by the page right after a letter is saved */
+.seal.auto {
+  display: grid;
+  animation: seal-fade 0.4s 1.7s forwards;
+}
+
+/* The red wax circle with the heart */
+.seal div {
+  display: grid;
+  place-items: center;
+  width: 150px;
+  height: 150px;
+  font-size: 64px;
+  color: #f6c9d0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, var(--seal-light), var(--seal) 70%);
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 8px rgba(0, 0, 0, 0.12);
+  animation: seal-stamp 0.6s cubic-bezier(0.2, 1.6, 0.4, 1);
+}
+
+/* "Sealed with love" text under the circle */
+.seal p {
+  position: absolute;
+  margin-top: 230px;
+  font-size: 1.4rem;
+  font-style: italic;
+}
+
+/* The seal drops in and stamps down */
+@keyframes seal-stamp {
+  from {
+    transform: scale(2.4) rotate(-25deg);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+/* The whole overlay fades out */
+@keyframes seal-fade {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* No motion for people who turned animations off */
+@media (prefers-reduced-motion: reduce) {
+  .seal div {
+    animation: none;
+  }
+}
+
+
+/* ==========================================================================
+   7. LOGIN PAGE
+   ========================================================================== */
+
+.login {
+  max-width: 420px;
+  margin: 4vh auto 0;
+  padding: 24px;
+  background: var(--card);
+  border-radius: 12px;
+}
+
+.plabel {
+  display: block;
+  margin-bottom: 6px;
+}
+
+/* Password box with the Show/Hide button inside it */
+.pw-wrap {
+  position: relative;
+}
+
+.login .pw {
+  width: 100%;
+  padding: 10px 84px 10px 14px;   /* extra space on the right for the button */
+  font: inherit;
+  font-size: 1.1rem;
+  color: var(--text);
+  background: transparent;
+  border: 1.5px solid var(--text);
+  border-radius: 999px;
+}
+
+.login .pw:focus-visible {
+  outline: 2px solid var(--seal-light);
+  outline-offset: 3px;
+}
+
+/* The Show/Hide button */
+.pw-toggle {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  padding: 4px 14px;
+  font-size: 0.9rem;
+  border-color: transparent;
+  transform: translateY(-50%);
+}
+
+.pw-toggle:active {
+  transform: translateY(-50%) scale(0.97);
+}
+
+/* "That password doesn't match" message */
+.err {
+  margin: 10px 0 0;
+  color: #ffb3bf;
+}
+
+
+/* ==========================================================================
+   8. READER PAGE (what Mariah sees)
+   ========================================================================== */
+
+/* Same ruled-paper look as the writing box, but read-only text */
+.letter-view {
+  min-height: 200px;
+  margin-top: 6px;
+  white-space: pre-wrap;      /* keeps the line breaks you typed */
+  overflow-wrap: anywhere;
+  background: repeating-linear-gradient(
+    transparent,
+    transparent 41px,
+    var(--line) 41px,
+    var(--line) 42px
+  );
+  background-attachment: local;
+  color: var(--ink);
+  font-family: Caveat, cursive, sans-serif;
+  font-size: 1.65rem;
+  line-height: 42px;
+}
+
+
+/* ==========================================================================
+   9. PRINT AND SMALL SCREENS
+   ========================================================================== */
+
+/* When printing: white page, only the letter */
+@media print {
+  body {
+    background: #fff;
+  }
+
+  .bar,
+  .shelf,
+  .foot button,
+  .who,
+  h1,
+  h2,
+  .sub {
+    display: none;
+  }
+
+  .paper {
+    box-shadow: none;
+    transform: none;
+  }
+}
+
+/* Phones: tighter paper and slightly smaller handwriting */
+@media (max-width: 480px) {
+  .paper {
+    padding: 20px 16px;
+  }
+
+  textarea,
+  .letter-view {
+    font-size: 1.5rem;
+  }
+}
