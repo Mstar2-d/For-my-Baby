@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dear You – Love Letters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Cormorant+Garamond:ital,wght@0,500;1,500;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<main>
+  <p class="who">Writing as {{ me }} · <a href="{{ url_for('gallery') }}">Gallery</a> · <a href="{{ url_for('logout') }}">Log out</a></p>
+  <h1>Dear You</h1>
+  <p class="sub">A quiet place to write the things you mean.</p>
+
+  <form method="post" action="{{ url_for('save_letter') }}">
+    <input type="hidden" name="id" value="{{ letter['id'] }}">
+
+    <div class="paper">
+      <div class="row">
+        <label for="to">My dearest</label>
+        <input type="text" id="to" name="to" value="Mariah" readonly tabindex="-1" style="cursor:default;border-bottom-style:solid">
+      </div>
+      <p class="date">{{ today }}</p>
+      <textarea id="body" name="body" placeholder="Start writing from the heart…" aria-label="Letter">{{ letter['body'] }}</textarea>
+      <div class="sig">
+        <label for="sender">Forever yours,</label>
+        <input type="text" id="sender" name="sender" value="Maryan" readonly tabindex="-1" style="cursor:default;border-bottom-style:solid">
+      </div>
+      <div class="foot">
+        <span id="count">{{ words }} {{ 'word' if words == 1 else 'words' }}</span>
+      </div>
+      {% if message %}<p class="msg">{{ message }}</p>{% endif %}
+    </div>
+
+    <div class="bar">
+      <button type="submit" formaction="{{ url_for('spark') }}">I need a spark</button>
+      <button type="button" onclick="window.print()">Print</button>
+      <button type="submit" class="primary">Seal and keep</button>
+    </div>
+  </form>
+
+  <h2>Your letters</h2>
+  <div class="shelf">
+    {% for l in letters %}
+      <div class="item">
+        <div class="dot"></div>
+        <a class="t" href="{{ url_for('open_letter', letter_id=l['id']) }}" style="color:inherit;text-decoration:none">
+          <b>To Mariah · {{ l['date'] }}</b>
+          <span>{{ l['body'] }}</span>
+        </a>
+        <form class="inline" method="post" action="{{ url_for('delete_letter', letter_id=l['id']) }}" onsubmit="return confirm('Delete this letter for good?')">
+          <button type="submit" aria-label="Delete letter">Delete</button>
+        </form>
+      </div>
+    {% else %}
+      <p class="empty">Sealed letters will rest here until you want to read them again.</p>
+    {% endfor %}
+  </div>
+</main>
+
+{% if sealed %}
+<div class="seal auto" role="status"><div>♥</div><p>Sealed with love</p></div>
+{% endif %}
+
+<script>
+  var body = document.getElementById('body');
+  var count = document.getElementById('count');
+
+  function updateCount() {
+    var text = body.value.trim();
+    var n = text ? text.split(/\s+/).length : 0;
+    count.textContent = n + (n === 1 ? ' word' : ' words');
+  }
+
+  body.addEventListener('input', updateCount);
+  updateCount();
+</script>
+</body>
+</html>

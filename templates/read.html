@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dear You – Letters for {{ her }}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Cormorant+Garamond:ital,wght@0,500;1,500;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<main>
+  <p class="who">Reading as {{ her }} · <a href="{{ url_for('gallery') }}">Gallery</a> · <a href="{{ url_for('logout') }}">Log out</a></p>
+  <h1>Dear {{ her }}</h1>
+  <p class="sub">Every letter written for you.</p>
+
+  {% if letter %}
+    <div class="paper">
+      <div class="row"><span style="color:var(--muted)">My dearest</span> <span>{{ her }},</span></div>
+      <p class="date">{{ letter['date'] }}</p>
+      <div class="letter-view">{{ letter['body'] }}</div>
+      <div class="sig"><span style="color:var(--muted)">Forever yours,</span> <span>{{ me }}</span></div>
+    </div>
+    <div class="bar">
+      <a href="{{ url_for('read_list') }}"><button type="button">All letters</button></a>
+      <button type="button" onclick="window.print()">Print</button>
+    </div>
+  {% else %}
+    <div class="shelf">
+      {% for l in letters %}
+        <div class="item">
+          <div class="dot"></div>
+          <a class="t" href="{{ url_for('read_letter', letter_id=l['id']) }}" style="color:inherit;text-decoration:none">
+            <b>From {{ me }} · {{ l['date'] }}</b>
+            <span>{{ l['body'] }}</span>
+          </a>
+        </div>
+      {% else %}
+        <p class="empty">No letters yet. Check back soon.</p>
+      {% endfor %}
+    </div>
+  {% endif %}
+</main>
+</body>
+</html>

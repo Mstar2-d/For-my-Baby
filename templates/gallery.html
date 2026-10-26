@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Our Gallery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Cormorant+Garamond:ital,wght@0,500;1,500;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<main>
+  <p class="who"><a href="{{ url_for('home') }}">Back to letters</a> · <a href="{{ url_for('logout') }}">Log out</a></p>
+  <h1>Our Gallery</h1>
+  <p class="sub">Little moments, kept together.</p>
+
+  <form class="upload" id="uploadForm" method="post" action="{{ url_for('upload_photos') }}" enctype="multipart/form-data">
+    <small>JPG, PNG or WebP, up to 10 MB each</small>
+    <input type="file" name="photos" accept="image/jpeg,image/png,image/webp" multiple required aria-label="Choose photos">
+    <div class="bar">
+      <button type="submit" class="primary" id="uploadBtn">Add to gallery</button>
+    </div>
+  </form>
+
+  {% with messages = get_flashed_messages() %}
+    {% for m in messages %}
+      <p class="note" role="status">{{ m }}</p>
+    {% endfor %}
+  {% endwith %}
+
+  {% if photos %}
+    <div class="grid">
+      {% for p in photos %}
+        <figure class="photo">
+          <button type="button" class="open" data-src="{{ url_for('photo', photo_id=p['id']) }}" aria-label="Open photo">
+            <img src="{{ url_for('photo', photo_id=p['id']) }}" alt="Photo from {{ p['by'] or 'us' }}" loading="lazy">
+          </button>
+          <figcaption>
+            <span>{{ p['by'] }}{% if p['by'] and p['date'] %} · {% endif %}{{ p['date'] }}</span>
+            <form class="inline" method="post" action="{{ url_for('delete_photo', photo_id=p['id']) }}" onsubmit="return confirm('Delete this photo for good?')">
+              <button type="submit" class="del" aria-label="Delete photo">Delete</button>
+            </form>
+          </figcaption>
+        </figure>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="empty" style="text-align:center;margin-top:32px">No photos yet. Add the first one above.</p>
+  {% endif %}
+</main>
+
+<dialog class="lightbox" id="lightbox">
+  <img id="big" src="" alt="Photo">
+</dialog>
+
+<script>
+  var box = document.getElementById('lightbox');
+  var big = document.getElementById('big');
+
+  document.querySelectorAll('.open').forEach(function (b) {
+    b.addEventListener('click', function () {
+      big.src = b.dataset.src;
+      box.showModal();
+    });
+  });
+  box.addEventListener('click', function () { box.close(); });
+
+  document.getElementById('uploadForm').addEventListener('submit', function () {
+    var btn = document.getElementById('uploadBtn');
+    btn.disabled = true;
+    btn.textContent = 'Uploading…';
+  });
+</script>
+</body>
+</html>
