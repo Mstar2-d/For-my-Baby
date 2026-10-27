@@ -289,10 +289,14 @@ def movie_toggle(movie_id):
     return redirect(url_for("movies_page"))
 
 
-@app.post("/movies/rate/<movie_id>")
+@app.post("/movies/review/<movie_id>")
 @login_required
-def movie_rate(movie_id):
-    movies.rate_movie(movie_id, request.form.get("rating", "0"))
+def movie_review(movie_id):
+    movies.save_review(
+        movie_id,
+        request.form.get("rating", "0"),
+        request.form.get("comment", ""),
+    )
     return redirect(url_for("movies_page"))
 
 

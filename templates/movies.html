@@ -18,16 +18,21 @@
       <span class="title">{{ m['title'] }}</span>
       <small>added by {{ m['by'] }}</small>
     </div>
-    {% if watched %}
-      <form class="stars" method="post" action="{{ url_for('movie_rate', movie_id=m['id']) }}" aria-label="Rate this movie">
-        {% for n in range(1, 6) %}
-          <button type="submit" name="rating" value="{{ n }}" class="star{% if m['rating'] >= n %} on{% endif %}" aria-label="Rate {{ n }} of 5 stars">★</button>
-        {% endfor %}
-      </form>
-    {% endif %}
     <form class="inline" method="post" action="{{ url_for('movie_delete', movie_id=m['id']) }}" onsubmit="return confirm('Remove this movie?')">
       <button type="submit" class="x" aria-label="Delete movie">Delete</button>
     </form>
+    {% if watched %}
+      <form class="review" method="post" action="{{ url_for('movie_review', movie_id=m['id']) }}">
+        {# Save comes first so pressing Enter in the comment box keeps the rating #}
+        <button type="submit" name="rating" value="{{ m['rating'] }}" class="save">Save</button>
+        <div class="stars">
+          {% for n in range(1, 6) %}
+            <button type="submit" name="rating" value="{{ n }}" class="star{% if m['rating'] >= n %} on{% endif %}" aria-label="Rate {{ n }} of 5 stars">★</button>
+          {% endfor %}
+        </div>
+        <input class="review-comment" type="text" name="comment" value="{{ m['comment'] }}" maxlength="300" placeholder="Add a comment…" aria-label="Comment about this movie">
+      </form>
+    {% endif %}
   </li>
 {% endmacro %}
 

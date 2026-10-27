@@ -1,4 +1,5 @@
-"""Our movie checklist: films we mean to watch together, each with a star rating.
+"""Our movie checklist: films we mean to watch together, each with a star rating
+and a short comment.
 
 Movies live in their own table called "movies" in the same database as the
 letters (see db.py). This is kept separate from the planner on purpose.
@@ -7,13 +8,14 @@ import re
 import uuid
 from datetime import datetime
 
-from sqlalchemy import text
+from sqlalchemy import inspect, text
 
 from db import engine
 
 SAFE_ID = re.compile(r"^[A-Za-z0-9]+$")
 MAX_TITLE = 200
 MAX_STARS = 5
+MAX_COMMENT = 300
 
 
 def _init():
@@ -26,9 +28,16 @@ def _init():
                 added_by TEXT NOT NULL,
                 watched INTEGER NOT NULL DEFAULT 0,
                 rating INTEGER NOT NULL DEFAULT 0,
+                comment TEXT NOT NULL DEFAULT '',
                 created TEXT NOT NULL
             )
         """))
+
+    # Lists made before comments existed need the column added.
+    existing = {c["name"] for c in inspect(engine).get_columns("movies")}
+    if "comment" not in existing:
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE movies ADD COLUMN comment TEXT NOT NULL DEFAULT ''"))
 
 
 _init()
@@ -41,6 +50,7 @@ def _movie(row):
         "by": row["added_by"],
         "watched": bool(row["watched"]),
         "rating": int(row["rating"] or 0),
+        "comment": row["comment"] or "",
     }
 
 
@@ -50,7 +60,7 @@ def board():
     """Everything the movies page needs: the watchlist and the watched ones."""
     with engine.connect() as conn:
         rows = conn.execute(text(
-            "SELECT id, title, added_by, watched, rating FROM movies ORDER BY created ASC"
+            "SELECT id, title, added_by, watched, rating, comment FROM movies ORDER BY created ASC"
         )).mappings().all()
 
     movies = [_movie(r) for r in rows]
@@ -91,19 +101,20 @@ def toggle_movie(movie_id):
         conn.execute(text("UPDATE movies SET watched = 1 - watched WHERE id = :id"), {"id": movie_id})
 
 
-def rate_movie(movie_id, rating):
-    """Sets a 0-5 star rating (0 clears it)."""
+def save_review(movie_id, rating, comment):
+    """Sets the 0-5 star rating and the comment on a movie."""
     if not SAFE_ID.match(movie_id):
         return
     try:
         stars = int(rating)
     except (TypeError, ValueError):
-        return
+        stars = 0
     stars = max(0, min(MAX_STARS, stars))
+    comment = (comment or "").strip()[:MAX_COMMENT]
     with engine.begin() as conn:
         conn.execute(
-            text("UPDATE movies SET rating = :rating WHERE id = :id"),
-            {"id": movie_id, "rating": stars},
+            text("UPDATE movies SET rating = :rating, comment = :comment WHERE id = :id"),
+            {"id": movie_id, "rating": stars, "comment": comment},
         )
 
 
