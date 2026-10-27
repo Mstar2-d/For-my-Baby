@@ -10,6 +10,7 @@
      7. Login page
      8. Reader page
      9. Print and small screens
+    10. Gallery
    ========================================================================== */
 
 
@@ -19,11 +20,15 @@
    ========================================================================== */
 
 :root {
-  /* Page */
-  --bg:       #2a1630;   /* main background (deep plum) */
-  --bg-glow:  #3b1d3f;   /* lighter glow at the top of the page */
-  --text:     #f6e6e8;   /* text on the dark background */
-  --card:     #4a2650;   /* list items and the login box */
+  /* Page background: a blend from blue to purple */
+  --bg-blue:   #1b2a74;   /* deep royal blue (top left of the page) */
+  --bg-purple: #4a1f7c;   /* rich purple (bottom right of the page) */
+  --bg-glow:   rgba(140, 118, 235, 0.35);   /* soft violet glow at the top */
+
+  /* Text and panels */
+  --text:     #f1eeff;                      /* text on the dark background */
+  --card:     rgba(255, 255, 255, 0.10);    /* list items and the login box */
+  --card-edge: rgba(255, 255, 255, 0.16);   /* thin border around panels */
 
   /* Paper */
   --paper:    #fbf3ee;   /* the letter paper */
@@ -41,10 +46,10 @@
 /* Slightly darker colors if the device is in dark mode */
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg:      #1a0e20;
-    --bg-glow: #27132d;
-    --paper:   #f0e4de;
-    --card:    #33193a;
+    --bg-blue:   #121c55;
+    --bg-purple: #331258;
+    --bg-glow:   rgba(120, 98, 215, 0.3);
+    --paper:     #f0e4de;
   }
 }
 
@@ -65,8 +70,11 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
-  background-color: var(--bg);
-  background-image: radial-gradient(1200px 600px at 50% -10%, var(--bg-glow), var(--bg));
+  background-color: var(--bg-blue);
+  background-image:
+    radial-gradient(1000px 600px at 50% -10%, var(--bg-glow), transparent),
+    linear-gradient(135deg, var(--bg-blue), var(--bg-purple));
+  background-attachment: fixed;   /* the colors stay put while you scroll */
   color: var(--text);
   font-family: "Cormorant Garamond", Georgia, serif;
   font-size: 18px;
@@ -264,11 +272,16 @@ button {
 }
 
 button:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.12);
 }
 
 button:active {
   transform: scale(0.97);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: wait;
 }
 
 /* Main action ("Seal and keep", "Log in") */
@@ -314,6 +327,7 @@ textarea:focus-visible {
   align-items: center;
   padding: 12px 14px;
   background: var(--card);
+  border: 1px solid var(--card-edge);
   border-radius: 8px;
 }
 
@@ -365,7 +379,7 @@ textarea:focus-visible {
   z-index: 20;
   display: none;
   place-items: center;
-  background: rgba(20, 8, 26, 0.7);
+  background: rgba(14, 10, 46, 0.72);
 }
 
 /* "auto" is added by the page right after a letter is saved */
@@ -435,6 +449,7 @@ textarea:focus-visible {
   margin: 4vh auto 0;
   padding: 24px;
   background: var(--card);
+  border: 1px solid var(--card-edge);
   border-radius: 12px;
 }
 
@@ -547,14 +562,11 @@ textarea:focus-visible {
     font-size: 1.5rem;
   }
 }
+
+
 /* ==========================================================================
    10. GALLERY
    ========================================================================== */
-
-button:disabled {
-  opacity: 0.6;
-  cursor: wait;
-}
 
 /* Upload box */
 .upload {
@@ -563,6 +575,7 @@ button:disabled {
   padding: 18px;
   text-align: center;
   background: var(--card);
+  border: 1px solid var(--card-edge);
   border-radius: 12px;
 }
 
@@ -676,7 +689,7 @@ button:disabled {
 }
 
 .lightbox::backdrop {
-  background: rgba(20, 8, 26, 0.85);
+  background: rgba(14, 10, 46, 0.88);
 }
 
 .lightbox img {
