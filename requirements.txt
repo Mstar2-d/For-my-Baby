@@ -1,7 +1,5 @@
 flask
 gunicorn
 pillow
-google-api-python-client
-google-auth
 sqlalchemy
 psycopg[binary]
