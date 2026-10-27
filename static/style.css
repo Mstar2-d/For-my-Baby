@@ -762,3 +762,164 @@ textarea:focus-visible {
   border-radius: 8px;
   cursor: zoom-out;
 }
+
+/* ==========================================================================
+   11. PLANNER
+   ========================================================================== */
+
+/* "Add a task" bar: task name, date, Add button */
+.add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  max-width: 620px;
+  margin: 0 auto 8px;
+  padding: 16px;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-edge);
+  border-radius: 18px;
+  box-shadow: var(--glass-shadow);
+}
+
+.add input[type="text"],
+.add input[type="date"] {
+  padding: 10px 14px;
+  font: inherit;
+  font-size: 1.1rem;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-edge);
+  border-radius: 999px;
+  color-scheme: dark;     /* makes the date picker dark */
+}
+
+.add input[type="text"] {
+  flex: 1 1 220px;
+}
+
+.add input[type="date"] {
+  flex: 0 0 auto;
+}
+
+.add input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.add input:focus-visible {
+  outline: 2px solid var(--seal-light);
+  outline-offset: 3px;
+}
+
+/* "3 to do · 5 done" */
+.progress {
+  margin: 18px 0 0;
+  text-align: center;
+  font-style: italic;
+  text-shadow: 0 2px 14px rgba(10, 6, 40, 0.7);
+}
+
+/* One day's tasks */
+.day {
+  margin-top: 26px;
+}
+
+.day h3 {
+  margin: 0 0 8px;
+  font-size: 1.4rem;
+  font-style: italic;
+  font-weight: 600;
+  text-shadow: 0 2px 14px rgba(10, 6, 40, 0.7);
+}
+
+/* Days that have already passed with tasks still open */
+.day.late h3 {
+  color: var(--error);
+}
+
+.tasks {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* One task, as a glass card */
+.task {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-edge);
+  border-radius: 14px;
+  box-shadow: var(--glass-shadow);
+}
+
+/* The round tick box on the left */
+.task .check {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  font-size: 1rem;
+  line-height: 1;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  border: 2px solid var(--glass-edge);
+  border-radius: 50%;
+}
+
+.task.done .check {
+  background: var(--seal);
+  border-color: var(--seal-light);
+}
+
+/* Task name and "added by" line */
+.task .what {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.task .title {
+  display: block;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.task .what small {
+  display: block;
+  font-size: 0.9rem;
+  opacity: 0.75;
+}
+
+/* Finished tasks are crossed out and softer */
+.task.done .title {
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.task .x {
+  padding: 2px 10px;
+  font-size: 0.85rem;
+  color: var(--error);
+  border-color: rgba(255, 179, 191, 0.6);
+}
+
+.task .x:hover {
+  background: rgba(255, 179, 191, 0.18);
+}
+
+/* "Clear done" button under the Done list */
+.clear {
+  margin-top: 14px;
+  text-align: center;
+}

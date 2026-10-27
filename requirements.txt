@@ -3,3 +3,4 @@ gunicorn
 pillow
 sqlalchemy
 psycopg[binary]
+tzdata

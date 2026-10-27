@@ -11,6 +11,7 @@ from flask import (
 
 import db
 import drive_store
+import planner
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "local-dev-key-change-me")
@@ -84,6 +85,10 @@ def role_required(role):
             return view(*args, **kwargs)
         return wrapped
     return decorator
+
+
+def who_is_logged_in():
+    return MY_NAME if session.get("role") == "writer" else HER_NAME
 
 
 def form_letter():
@@ -214,6 +219,52 @@ def dbcheck():
     return f"Database: {db.engine.dialect.name} | Letters: {len(db.load_letters())}"
 
 
+# ---------- Planner (Maryan and Mariah) ----------
+
+@app.get("/planner")
+@login_required
+def planner_page():
+    return render_template(
+        "planner.html",
+        board=planner.board(),
+        today=planner.today().isoformat(),
+    )
+
+
+@app.post("/planner/add")
+@login_required
+def planner_add():
+    added = planner.add_task(
+        request.form.get("title", ""),
+        request.form.get("due", ""),
+        who_is_logged_in(),
+    )
+    if not added:
+        flash("Write the task first.")
+    return redirect(url_for("planner_page"))
+
+
+@app.post("/planner/toggle/<task_id>")
+@login_required
+def planner_toggle(task_id):
+    planner.toggle_task(task_id)
+    return redirect(url_for("planner_page"))
+
+
+@app.post("/planner/delete/<task_id>")
+@login_required
+def planner_delete(task_id):
+    planner.delete_task(task_id)
+    return redirect(url_for("planner_page"))
+
+
+@app.post("/planner/clear-done")
+@login_required
+def planner_clear():
+    planner.clear_done()
+    return redirect(url_for("planner_page"))
+
+
 # ---------- Gallery (Maryan and Mariah) ----------
 
 @app.get("/gallery")
@@ -231,7 +282,7 @@ def gallery():
 @app.post("/gallery/upload")
 @login_required
 def upload_photos():
-    who = MY_NAME if session["role"] == "writer" else HER_NAME
+    who = who_is_logged_in()
     files = [f for f in request.files.getlist("photos") if f and f.filename]
     if not files:
         flash("Choose at least one photo first.")

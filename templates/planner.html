@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Our Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Cormorant+Garamond:ital,wght@0,500;1,500;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+{% macro task_row(t) %}
+  <li class="task{% if t['done'] %} done{% endif %}">
+    <form class="inline" method="post" action="{{ url_for('planner_toggle', task_id=t['id']) }}">
+      <button type="submit" class="check" aria-label="{{ 'Mark as not done' if t['done'] else 'Mark as done' }}">{% if t['done'] %}✓{% endif %}</button>
+    </form>
+    <div class="what">
+      <span class="title">{{ t['title'] }}</span>
+      <small>added by {{ t['by'] }}{% if t['done'] %} · {{ t['date_label'] }}{% endif %}</small>
+    </div>
+    <form class="inline" method="post" action="{{ url_for('planner_delete', task_id=t['id']) }}" onsubmit="return confirm('Delete this task?')">
+      <button type="submit" class="x" aria-label="Delete task">Delete</button>
+    </form>
+  </li>
+{% endmacro %}
+
+<main>
+  <p class="who"><a href="{{ url_for('home') }}">Back to letters</a> · <a href="{{ url_for('logout') }}">Log out</a></p>
+  <h1>Our Planner</h1>
+  <p class="sub">Little things to do together, one day at a time.</p>
+
+  <form class="add" method="post" action="{{ url_for('planner_add') }}">
+    <input type="text" name="title" placeholder="What’s the plan?" maxlength="200" autocomplete="off" required aria-label="Task">
+    <input type="date" name="due" value="{{ today }}" required aria-label="Date">
+    <button type="submit" class="primary">Add</button>
+  </form>
+
+  {% with messages = get_flashed_messages() %}
+    {% for m in messages %}
+      <p class="note" role="status">{{ m }}</p>
+    {% endfor %}
+  {% endwith %}
+
+  {% if board['groups'] or board['done'] %}
+    <p class="progress">{{ board['open_count'] }} to do · {{ board['done_count'] }} done</p>
+  {% else %}
+    <p class="empty" style="text-align:center;margin-top:32px">Nothing planned yet. Add the first thing above.</p>
+  {% endif %}
+
+  {% for g in board['groups'] %}
+    <section class="day{% if g['late'] %} late{% endif %}">
+      <h3>{{ g['label'] }}{% if g['late'] %} · overdue{% endif %}</h3>
+      <ul class="tasks">
+        {% for t in g['tasks'] %}{{ task_row(t) }}{% endfor %}
+      </ul>
+    </section>
+  {% endfor %}
+
+  {% if board['done'] %}
+    <h2>Done</h2>
+    <ul class="tasks">
+      {% for t in board['done'] %}{{ task_row(t) }}{% endfor %}
+    </ul>
+    <form class="clear" method="post" action="{{ url_for('planner_clear') }}" onsubmit="return confirm('Remove all finished tasks?')">
+      <button type="submit">Clear done</button>
+    </form>
+  {% endif %}
+</main>
+
+<script>
+  // Keeps your place on the page after ticking or deleting a task
+  document.addEventListener('submit', function () {
+    try { sessionStorage.setItem('plannerY', String(window.scrollY)); } catch (e) {}
+  });
+  try {
+    var y = sessionStorage.getItem('plannerY');
+    if (y !== null) {
+      window.scrollTo(0, Number(y));
+      sessionStorage.removeItem('plannerY');
+    }
+  } catch (e) {}
+</script>
+</body>
+</html>
