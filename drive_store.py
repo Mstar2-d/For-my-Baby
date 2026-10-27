@@ -10,12 +10,13 @@ import uuid
 from datetime import datetime
 
 from PIL import Image, ImageOps
-from sqlalchemy import text
+from sqlalchemy import inspect, text
 
 from db import engine
 
 MAX_MB = 10        # biggest file accepted
 MAX_SIDE = 1600    # photos are shrunk so the longest side is this many pixels
+MAX_CAPTION = 300  # longest caption kept
 SAFE_ID = re.compile(r"^[A-Za-z0-9_.-]+$")
 
 Image.MAX_IMAGE_PIXELS = 60_000_000
@@ -34,9 +35,16 @@ def _init():
                 id TEXT PRIMARY KEY,
                 uploader TEXT NOT NULL,
                 created TEXT NOT NULL,
+                caption TEXT NOT NULL DEFAULT '',
                 data {binary} NOT NULL
             )
         """))
+
+    # Galleries made before captions existed need the column added.
+    existing = {c["name"] for c in inspect(engine).get_columns("photos")}
+    if "caption" not in existing:
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE photos ADD COLUMN caption TEXT NOT NULL DEFAULT ''"))
 
 
 _init()
@@ -79,23 +87,44 @@ def list_photos():
     """Newest first. Doesn't load the pictures themselves, only their details."""
     with engine.connect() as conn:
         rows = conn.execute(text(
-            "SELECT id, uploader, created FROM photos ORDER BY created DESC LIMIT 200"
+            "SELECT id, uploader, created, caption FROM photos ORDER BY created DESC LIMIT 200"
         )).mappings().all()
-    return [{"id": r["id"], "by": r["uploader"], "date": _date(r["created"])} for r in rows]
+    return [{
+        "id": r["id"],
+        "by": r["uploader"],
+        "date": _date(r["created"]),
+        "caption": r["caption"] or "",
+    } for r in rows]
 
 
-def save_photo(data, uploader):
+def _clean_caption(caption):
+    return (caption or "").strip()[:MAX_CAPTION]
+
+
+def save_photo(data, uploader, caption=""):
     jpeg = prepare(data)
     with engine.begin() as conn:
         conn.execute(
-            text("""INSERT INTO photos (id, uploader, created, data)
-                    VALUES (:id, :who, :created, :data)"""),
+            text("""INSERT INTO photos (id, uploader, created, caption, data)
+                    VALUES (:id, :who, :created, :caption, :data)"""),
             {
                 "id": uuid.uuid4().hex,
                 "who": uploader,
                 "created": datetime.now().isoformat(),
+                "caption": _clean_caption(caption),
                 "data": jpeg,
             },
+        )
+
+
+def set_caption(photo_id, caption):
+    """Adds or changes the caption on an existing photo."""
+    if not SAFE_ID.match(photo_id):
+        return
+    with engine.begin() as conn:
+        conn.execute(
+            text("UPDATE photos SET caption = :caption WHERE id = :id"),
+            {"id": photo_id, "caption": _clean_caption(caption)},
         )
 
 

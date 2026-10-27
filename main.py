@@ -283,6 +283,7 @@ def gallery():
 @login_required
 def upload_photos():
     who = who_is_logged_in()
+    caption = request.form.get("caption", "")
     files = [f for f in request.files.getlist("photos") if f and f.filename]
     if not files:
         flash("Choose at least one photo first.")
@@ -291,7 +292,7 @@ def upload_photos():
     added = skipped = 0
     for f in files:
         try:
-            drive_store.save_photo(f.read(), who)
+            drive_store.save_photo(f.read(), who, caption)
             added += 1
         except drive_store.BadImage:
             skipped += 1
@@ -304,6 +305,17 @@ def upload_photos():
         flash(f"{added} {'photo' if added == 1 else 'photos'} added.")
     if skipped:
         flash(f"{skipped} skipped. Only JPG, PNG or WebP photos up to {drive_store.MAX_MB} MB work.")
+    return redirect(url_for("gallery"))
+
+
+@app.post("/gallery/caption/<photo_id>")
+@login_required
+def caption_photo(photo_id):
+    try:
+        drive_store.set_caption(photo_id, request.form.get("caption", ""))
+    except Exception:
+        app.logger.exception("Could not save a caption")
+        flash("Couldn’t save that caption. Please try again.")
     return redirect(url_for("gallery"))
 
 

@@ -724,6 +724,63 @@ textarea:focus-visible {
   background: rgba(255, 179, 191, 0.18);
 }
 
+/* Caption row: view it, or open a small box to write one */
+.photo .cap-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.photo .edit-cap,
+.photo .save {
+  padding: 2px 10px;
+  font-size: 0.85rem;
+}
+
+.photo .cap-text {
+  flex: 1 1 100%;
+  margin: 4px 0 0;
+  font-size: 1.15rem;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.cap-form {
+  display: flex;
+  flex: 1 1 100%;
+  gap: 6px;
+  align-items: center;
+  margin-top: 6px;
+}
+
+.cap-form[hidden] {
+  display: none;
+}
+
+.cap-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 6px 4px;
+  font: inherit;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  border-bottom: 1.5px dashed var(--line);
+}
+
+.cap-input::placeholder {
+  color: var(--muted);
+}
+
+.cap-input:focus {
+  outline: none;
+  border-bottom-color: var(--seal-light);
+}
+
+.upload .cap-input {
+  margin-top: 12px;
+}
+
 /* Full-size view when you click a photo */
 .lightbox {
   max-width: 95vw;

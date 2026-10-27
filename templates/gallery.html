@@ -17,6 +17,7 @@
   <form class="upload" id="uploadForm" method="post" action="{{ url_for('upload_photos') }}" enctype="multipart/form-data">
     <small>JPG, PNG or WebP, up to 10 MB each</small>
     <input type="file" name="photos" accept="image/jpeg,image/png,image/webp" multiple required aria-label="Choose photos">
+    <input class="cap-input" type="text" name="caption" maxlength="300" placeholder="Add a caption (optional)" aria-label="Caption for these photos">
     <div class="bar">
       <button type="submit" class="primary" id="uploadBtn">Add to gallery</button>
     </div>
@@ -37,8 +38,18 @@
           </button>
           <figcaption>
             <span>{{ p['by'] }}{% if p['by'] and p['date'] %} · {% endif %}{{ p['date'] }}</span>
-            <form class="inline" method="post" action="{{ url_for('delete_photo', photo_id=p['id']) }}" onsubmit="return confirm('Delete this photo for good?')">
-              <button type="submit" class="del" aria-label="Delete photo">Delete</button>
+            <div class="cap-actions">
+              <button type="button" class="edit-cap" data-id="{{ p['id'] }}">{% if p['caption'] %}Edit{% else %}Caption{% endif %}</button>
+              <form class="inline" method="post" action="{{ url_for('delete_photo', photo_id=p['id']) }}" onsubmit="return confirm('Delete this photo for good?')">
+                <button type="submit" class="del" aria-label="Delete photo">Delete</button>
+              </form>
+            </div>
+            {% if p['caption'] %}
+              <p class="cap-text">{{ p['caption'] }}</p>
+            {% endif %}
+            <form class="cap-form" id="cap-{{ p['id'] }}" hidden method="post" action="{{ url_for('caption_photo', photo_id=p['id']) }}">
+              <input class="cap-input" type="text" name="caption" value="{{ p['caption'] }}" maxlength="300" placeholder="Write a caption…" aria-label="Caption for this photo">
+              <button type="submit" class="save">Save</button>
             </form>
           </figcaption>
         </figure>
@@ -64,6 +75,16 @@
     });
   });
   box.addEventListener('click', function () { box.close(); });
+
+  document.querySelectorAll('.edit-cap').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var form = document.getElementById('cap-' + b.dataset.id);
+      form.hidden = !form.hidden;
+      if (!form.hidden) {
+        form.querySelector('input').focus();
+      }
+    });
+  });
 
   document.getElementById('uploadForm').addEventListener('submit', function () {
     var btn = document.getElementById('uploadBtn');
