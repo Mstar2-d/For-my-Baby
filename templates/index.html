@@ -14,14 +14,14 @@
   <h1>Dear You</h1>
   <p class="sub">A quiet place to write the things you mean.</p>
 
-  <div class="bar" style="margin-top:0">
-    <form class="inline" method="get" action="{{ url_for('gallery') }}">
+  <nav class="nav" aria-label="Sections">
+    <form method="get" action="{{ url_for('gallery') }}">
       <button type="submit" class="primary">📷 Gallery</button>
     </form>
-    <form class="inline" method="get" action="{{ url_for('planner_page') }}">
+    <form method="get" action="{{ url_for('planner_page') }}">
       <button type="submit" class="primary">📋 Planner</button>
     </form>
-  </div>
+  </nav>
 
   <form method="post" action="{{ url_for('save_letter') }}">
     <input type="hidden" name="id" value="{{ letter['id'] }}">
@@ -43,7 +43,7 @@
       {% if message %}<p class="msg">{{ message }}</p>{% endif %}
     </div>
 
-    <div class="bar">
+    <div class="bar actions">
       <button type="submit" formaction="{{ url_for('spark') }}">I need a spark</button>
       <button type="button" onclick="window.print()">Print</button>
       <button type="submit" class="primary">Seal and keep</button>

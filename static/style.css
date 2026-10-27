@@ -5,13 +5,15 @@
      2. Layout and headings
      3. The glass panel (writing area)
      4. Buttons
-     5. Saved letters list
-     6. Wax seal animation
-     7. Login page
-     8. Reader page
-     9. Print and small screens
+     5. Top menu and action buttons
+     6. Saved letters list
+     7. Wax seal animation
+     8. Login page
+     9. Reader page
     10. Gallery
     11. Planner
+    12. Print
+    13. Phones and touch screens (always last, so it wins)
    ========================================================================== */
 
 
@@ -50,12 +52,18 @@
   color-scheme: dark;
 }
 
-/* Keeps content clear of phone notches and system bars */
+/* Keeps content clear of phone notches, rounded corners and system bars */
 html {
   box-sizing: border-box;
-  padding-top: env(safe-area-inset-top, 0px);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding:
+    env(safe-area-inset-top, 0px)
+    env(safe-area-inset-right, 0px)
+    env(safe-area-inset-bottom, 0px)
+    env(safe-area-inset-left, 0px);
   scroll-padding-top: env(safe-area-inset-top, 0px);
+  -webkit-text-size-adjust: 100%;   /* stops phones from resizing text on their own */
+  text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
 }
 
 *,
@@ -87,7 +95,13 @@ body::before {
     linear-gradient(135deg, var(--bg-blue), var(--bg-purple));
   background-repeat: no-repeat;
   background-size: auto 100vh, auto 100vh, auto, auto;
+  /* Phones: use the real visible height, even when the address bar moves */
+  background-size: auto 100dvh, auto 100dvh, auto, auto;
   background-position: left 3vw center, right 3vw center, center, center;
+}
+
+img {
+  max-width: 100%;
 }
 
 /* Text that sits straight on the photos gets a soft shadow so it stays readable */
@@ -141,6 +155,8 @@ h2 {
 }
 
 .who a {
+  display: inline-block;
+  padding: 6px 4px;
   color: var(--text);
 }
 
@@ -336,7 +352,36 @@ textarea:focus-visible {
 
 
 /* ==========================================================================
-   5. SAVED LETTERS LIST
+   5. TOP MENU AND ACTION BUTTONS
+   ========================================================================== */
+
+/* The Gallery and Planner buttons under the title */
+.nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  max-width: 420px;
+  margin: 0 auto 22px;
+}
+
+.nav form {
+  display: block;
+  margin: 0;
+}
+
+.nav button {
+  width: 100%;
+}
+
+/* "I need a spark", "Print" and "Seal and keep" under the letter.
+   On a computer they sit in a row; section 13 stacks them on phones. */
+.actions {
+  justify-content: center;
+}
+
+
+/* ==========================================================================
+   6. SAVED LETTERS LIST
    ========================================================================== */
 
 .shelf {
@@ -396,7 +441,7 @@ textarea:focus-visible {
 
 
 /* ==========================================================================
-   6. WAX SEAL ANIMATION
+   7. WAX SEAL ANIMATION
    Shown for about 2 seconds after "Seal and keep", then fades away.
    ========================================================================== */
 
@@ -470,7 +515,7 @@ textarea:focus-visible {
 
 
 /* ==========================================================================
-   7. LOGIN PAGE
+   8. LOGIN PAGE
    ========================================================================== */
 
 .login {
@@ -534,7 +579,7 @@ textarea:focus-visible {
 
 
 /* ==========================================================================
-   8. READER PAGE (what Mariah sees)
+   9. READER PAGE (what Mariah sees)
    ========================================================================== */
 
 /* Same ruled look as the writing box, but read-only text */
@@ -554,70 +599,6 @@ textarea:focus-visible {
   font-family: Caveat, cursive, sans-serif;
   font-size: 1.65rem;
   line-height: 42px;
-}
-
-
-/* ==========================================================================
-   9. PRINT AND SMALL SCREENS
-   ========================================================================== */
-
-/* When printing: plain white page with dark writing, only the letter */
-@media print {
-  :root {
-    --ink: #222222;
-    --line: #cccccc;
-    --muted: #666666;
-  }
-
-  body {
-    background: #fff;
-    color: #222;
-  }
-
-  body::before {
-    display: none;
-  }
-
-  .bar,
-  .shelf,
-  .foot button,
-  .who,
-  h1,
-  h2,
-  .sub {
-    display: none;
-  }
-
-  .paper {
-    background: none;
-    border: 0;
-    box-shadow: none;
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
-}
-
-/* Phones: the photo strips sit at the edges, partly hidden behind the glass */
-@media (max-width: 700px) {
-  body::before {
-    background-position: left -110px center, right -110px center, center, center;
-  }
-
-  .paper {
-    padding: 20px 16px;
-  }
-
-  textarea,
-  .letter-view {
-    font-size: 1.5rem;
-  }
-}
-
-/* Older browsers that can't blur: make the glass a bit darker so text stays readable */
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  :root {
-    --glass-bg: rgba(34, 22, 96, 0.78);
-  }
 }
 
 
@@ -924,4 +905,180 @@ textarea:focus-visible {
 .clear {
   margin-top: 14px;
   text-align: center;
+}
+
+
+/* ==========================================================================
+   12. PRINT
+   ========================================================================== */
+
+/* When printing: plain white page with dark writing, only the letter */
+@media print {
+  :root {
+    --ink: #222222;
+    --line: #cccccc;
+    --muted: #666666;
+  }
+
+  body {
+    background: #fff;
+    color: #222;
+  }
+
+  body::before {
+    display: none;
+  }
+
+  .nav,
+  .bar,
+  .shelf,
+  .foot button,
+  .who,
+  h1,
+  h2,
+  .sub {
+    display: none;
+  }
+
+  .paper {
+    background: none;
+    border: 0;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* Older browsers that can't blur: make the glass a bit darker so text stays readable */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root {
+    --glass-bg: rgba(34, 22, 96, 0.78);
+  }
+}
+
+
+/* ==========================================================================
+   13. PHONES AND TOUCH SCREENS
+   This section is last on purpose: it overrides the rules above on small screens.
+   ========================================================================== */
+
+/* Narrow screens (phones) */
+@media (max-width: 700px) {
+  /* Photo strips sit at the edges, partly hidden behind the glass */
+  body::before {
+    background-position: left -110px center, right -110px center, center, center;
+  }
+
+  main {
+    padding: 18px 14px 48px;
+  }
+
+  h2 {
+    margin-top: 34px;
+  }
+
+  /* Panels get a bit less padding so there's more room for writing */
+  .paper,
+  .login,
+  .upload,
+  .add {
+    padding: 18px 16px;
+  }
+
+  /* Letter writing */
+  .row,
+  .sig {
+    font-size: 1.5rem;
+  }
+
+  textarea {
+    min-height: 320px;
+  }
+
+  textarea,
+  .letter-view {
+    font-size: 1.5rem;
+  }
+
+  /* "Seal and keep" is a full-width button on top;
+     "I need a spark" and "Print" share the row under it */
+  .actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .actions button {
+    width: 100%;
+  }
+
+  .actions .primary {
+    grid-column: 1 / -1;
+    order: -1;
+  }
+
+  /* Saved letters */
+  .item {
+    gap: 10px;
+    padding: 10px 12px;
+  }
+
+  /* Gallery: two photos per row */
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+  }
+
+  .photo {
+    padding: 6px 6px 8px;
+  }
+
+  /* Planner: task name on its own row, then the date and Add button */
+  .add input[type="text"] {
+    flex: 1 1 100%;
+  }
+
+  .add input[type="date"] {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .task {
+    gap: 10px;
+    padding: 10px 12px;
+  }
+
+  .task .check {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* Touch screens: bigger tap targets */
+@media (pointer: coarse) {
+  button {
+    min-height: 44px;
+    touch-action: manipulation;   /* no delay or accidental zoom on double tap */
+  }
+
+  .item button,
+  .photo .del,
+  .task .x {
+    min-height: 38px;
+    padding: 4px 14px;
+  }
+
+  .task .check {
+    width: 40px;
+    height: 40px;
+    min-height: 40px;
+  }
+
+  .pw-toggle {
+    min-height: 36px;
+  }
+
+  .who a {
+    padding: 10px 6px;
+  }
 }
