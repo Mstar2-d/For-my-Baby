@@ -3,7 +3,7 @@
    Sections:
      1. Colors and page basics
      2. Layout and headings
-     3. The paper (writing area)
+     3. The glass panel (writing area)
      4. Buttons
      5. Saved letters list
      6. Wax seal animation
@@ -20,37 +20,33 @@
    ========================================================================== */
 
 :root {
-  /* Page background: a blend from blue to purple */
-  --bg-blue:   #1b2a74;   /* deep royal blue (top left of the page) */
-  --bg-purple: #4a1f7c;   /* rich purple (bottom right of the page) */
-  --bg-glow:   rgba(140, 118, 235, 0.35);   /* soft violet glow at the top */
+  /* Page background: blue to purple, with your photo strips on top */
+  --bg-blue:   #1b2a74;
+  --bg-purple: #4a1f7c;
+  --bg-glow:   rgba(140, 118, 235, 0.35);
 
-  /* Text and panels */
-  --text:     #f1eeff;                      /* text on the dark background */
-  --card:     rgba(255, 255, 255, 0.10);    /* list items and the login box */
-  --card-edge: rgba(255, 255, 255, 0.16);   /* thin border around panels */
+  /* Text */
+  --text:   #ffffff;
+  --ink:    #ffffff;                    /* handwriting color on the glass */
+  --line:   rgba(255, 255, 255, 0.28);  /* ruled lines */
+  --muted:  rgba(255, 255, 255, 0.78);  /* soft labels like "My dearest" */
 
-  /* Paper */
-  --paper:    #fbf3ee;   /* the letter paper */
-  --ink:      #2b2350;   /* handwriting color */
-  --line:     #e7d2cf;   /* ruled lines on the paper */
-  --muted:    #8b6f78;   /* soft labels like "My dearest" */
+  /* Glass: a see-through tint, a blur, and a thin bright edge */
+  --glass-bg:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.06)),
+    rgba(34, 22, 96, 0.38);
+  --glass-blur: blur(16px) saturate(150%);
+  --glass-edge: rgba(255, 255, 255, 0.35);
+  --glass-shadow:
+    0 8px 32px rgba(10, 6, 40, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
 
   /* Accents */
-  --seal:     #9e1b32;   /* wax seal and main button */
-  --seal-light: #c9304a; /* hover and focus color */
+  --seal:       #9e1b32;   /* wax seal and main button */
+  --seal-light: #c9304a;   /* hover and focus color */
+  --error:      #ffb3bf;   /* messages that need attention */
 
-  color-scheme: light dark;
-}
-
-/* Slightly darker colors if the device is in dark mode */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-blue:   #121c55;
-    --bg-purple: #331258;
-    --bg-glow:   rgba(120, 98, 215, 0.3);
-    --paper:     #f0e4de;
-  }
+  color-scheme: dark;
 }
 
 /* Keeps content clear of phone notches and system bars */
@@ -71,13 +67,34 @@ body {
   margin: 0;
   min-height: 100vh;
   background-color: var(--bg-blue);
-  background-image:
-    radial-gradient(1000px 600px at 50% -10%, var(--bg-glow), transparent),
-    linear-gradient(135deg, var(--bg-blue), var(--bg-purple));
-  background-attachment: fixed;   /* the colors stay put while you scroll */
   color: var(--text);
   font-family: "Cormorant Garamond", Georgia, serif;
   font-size: 18px;
+}
+
+/* The background: your two photo strips on top of a blue-to-purple blend.
+   It stays fixed, so the photos don't move while you scroll. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    url("bg1.jpg"),
+    url("bg2.jpg"),
+    radial-gradient(1000px 600px at 50% -10%, var(--bg-glow), transparent),
+    linear-gradient(135deg, var(--bg-blue), var(--bg-purple));
+  background-repeat: no-repeat;
+  background-size: auto 100vh, auto 100vh, auto, auto;
+  background-position: left 3vw center, right 3vw center, center, center;
+}
+
+/* Text that sits straight on the photos gets a soft shadow so it stays readable */
+h1,
+h2,
+.sub,
+.who {
+  text-shadow: 0 2px 14px rgba(10, 6, 40, 0.7);
 }
 
 
@@ -112,7 +129,7 @@ h2 {
   margin: 0 0 26px;
   text-align: center;
   font-style: italic;
-  opacity: 0.8;
+  opacity: 0.9;
 }
 
 /* "Writing as Maryan · Log out" at the top right */
@@ -120,42 +137,41 @@ h2 {
   margin: 0;
   text-align: right;
   font-size: 1rem;
-  opacity: 0.85;
 }
 
 .who a {
   color: var(--text);
 }
 
-/* Small message under the paper, like "Write a few words before sealing" */
+/* Small message under the panel, like "Write a few words before sealing" */
 .msg {
   margin: 8px 0 0;
   font-family: Caveat, cursive, sans-serif;
   font-size: 1.3rem;
-  color: var(--seal);
+  color: var(--error);
 }
 
 .empty {
   font-style: italic;
-  opacity: 0.7;
+  opacity: 0.85;
 }
 
 
 /* ==========================================================================
-   3. THE PAPER (WRITING AREA)
+   3. THE GLASS PANEL (WRITING AREA)
    ========================================================================== */
 
-/* The sheet of paper, tilted a tiny bit */
+/* The frosted glass sheet the letter is written on */
 .paper {
   position: relative;
   padding: 28px 26px 30px;
-  background: var(--paper);
   color: var(--ink);
-  border-radius: 4px;
-  transform: rotate(-0.4deg);
-  box-shadow:
-    0 30px 60px -20px rgba(0, 0, 0, 0.6),
-    0 2px 0 rgba(255, 255, 255, 0.4) inset;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-edge);
+  border-radius: 18px;
+  box-shadow: var(--glass-shadow);
 }
 
 /* "My dearest Mariah" line */
@@ -197,7 +213,7 @@ input[type="text"] {
 input[type="text"]:focus,
 textarea:focus {
   outline: none;
-  border-bottom-color: var(--seal);
+  border-bottom-color: var(--seal-light);
 }
 
 /* Today's date, right-aligned */
@@ -232,7 +248,11 @@ textarea {
   line-height: 42px;
 }
 
-/* Word count under the paper */
+textarea::placeholder {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* Word count under the panel */
 .foot {
   display: flex;
   flex-wrap: wrap;
@@ -250,7 +270,7 @@ textarea {
    4. BUTTONS
    ========================================================================== */
 
-/* Row of buttons under the paper */
+/* Row of buttons under the panel */
 .bar {
   display: flex;
   flex-wrap: wrap;
@@ -259,20 +279,23 @@ textarea {
   margin: 22px 0 8px;
 }
 
+/* Glass buttons */
 button {
   padding: 10px 18px;
   font: inherit;
   font-size: 1rem;
   color: var(--text);
-  background: transparent;
-  border: 1.5px solid var(--text);
+  background: rgba(255, 255, 255, 0.14);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-edge);
   border-radius: 999px;
   cursor: pointer;
   transition: transform 0.15s, background 0.15s;
 }
 
 button:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.26);
 }
 
 button:active {
@@ -284,12 +307,12 @@ button:disabled {
   cursor: wait;
 }
 
-/* Main action ("Seal and keep", "Log in") */
+/* Main action ("Seal and keep", "Log in", "Gallery") */
 button.primary {
   font-weight: 600;
   color: #fff;
   background: var(--seal);
-  border-color: var(--seal);
+  border-color: var(--seal-light);
 }
 
 button.primary:hover {
@@ -320,15 +343,18 @@ textarea:focus-visible {
   gap: 10px;
 }
 
-/* One saved letter */
+/* One saved letter, as a glass card */
 .item {
   display: flex;
   gap: 12px;
   align-items: center;
   padding: 12px 14px;
-  background: var(--card);
-  border: 1px solid var(--card-edge);
-  border-radius: 8px;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-edge);
+  border-radius: 14px;
+  box-shadow: var(--glass-shadow);
 }
 
 /* Little red wax dot on the left */
@@ -359,7 +385,7 @@ textarea:focus-visible {
   font-size: 0.95rem;
   white-space: nowrap;
   text-overflow: ellipsis;
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
 .item button {
@@ -379,7 +405,9 @@ textarea:focus-visible {
   z-index: 20;
   display: none;
   place-items: center;
-  background: rgba(14, 10, 46, 0.72);
+  background: rgba(14, 10, 46, 0.6);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
 }
 
 /* "auto" is added by the page right after a letter is saved */
@@ -448,9 +476,12 @@ textarea:focus-visible {
   max-width: 420px;
   margin: 4vh auto 0;
   padding: 24px;
-  background: var(--card);
-  border: 1px solid var(--card-edge);
-  border-radius: 12px;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-edge);
+  border-radius: 18px;
+  box-shadow: var(--glass-shadow);
 }
 
 .plabel {
@@ -469,8 +500,8 @@ textarea:focus-visible {
   font: inherit;
   font-size: 1.1rem;
   color: var(--text);
-  background: transparent;
-  border: 1.5px solid var(--text);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-edge);
   border-radius: 999px;
 }
 
@@ -497,7 +528,7 @@ textarea:focus-visible {
 /* "That password doesn't match" message */
 .err {
   margin: 10px 0 0;
-  color: #ffb3bf;
+  color: var(--error);
 }
 
 
@@ -505,7 +536,7 @@ textarea:focus-visible {
    8. READER PAGE (what Mariah sees)
    ========================================================================== */
 
-/* Same ruled-paper look as the writing box, but read-only text */
+/* Same ruled look as the writing box, but read-only text */
 .letter-view {
   min-height: 200px;
   margin-top: 6px;
@@ -529,10 +560,21 @@ textarea:focus-visible {
    9. PRINT AND SMALL SCREENS
    ========================================================================== */
 
-/* When printing: white page, only the letter */
+/* When printing: plain white page with dark writing, only the letter */
 @media print {
+  :root {
+    --ink: #222222;
+    --line: #cccccc;
+    --muted: #666666;
+  }
+
   body {
     background: #fff;
+    color: #222;
+  }
+
+  body::before {
+    display: none;
   }
 
   .bar,
@@ -546,13 +588,20 @@ textarea:focus-visible {
   }
 
   .paper {
+    background: none;
+    border: 0;
     box-shadow: none;
-    transform: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
 }
 
-/* Phones: tighter paper and slightly smaller handwriting */
-@media (max-width: 480px) {
+/* Phones: the photo strips sit at the edges, partly hidden behind the glass */
+@media (max-width: 700px) {
+  body::before {
+    background-position: left -110px center, right -110px center, center, center;
+  }
+
   .paper {
     padding: 20px 16px;
   }
@@ -560,6 +609,13 @@ textarea:focus-visible {
   textarea,
   .letter-view {
     font-size: 1.5rem;
+  }
+}
+
+/* Older browsers that can't blur: make the glass a bit darker so text stays readable */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root {
+    --glass-bg: rgba(34, 22, 96, 0.78);
   }
 }
 
@@ -574,15 +630,18 @@ textarea:focus-visible {
   margin: 0 auto 8px;
   padding: 18px;
   text-align: center;
-  background: var(--card);
-  border: 1px solid var(--card-edge);
-  border-radius: 12px;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-edge);
+  border-radius: 18px;
+  box-shadow: var(--glass-shadow);
 }
 
 .upload small {
   display: block;
   margin-bottom: 10px;
-  opacity: 0.75;
+  opacity: 0.85;
 }
 
 .upload input[type="file"] {
@@ -596,8 +655,8 @@ textarea:focus-visible {
   padding: 8px 16px;
   font: inherit;
   color: var(--text);
-  background: transparent;
-  border: 1.5px solid var(--text);
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid var(--glass-edge);
   border-radius: 999px;
   cursor: pointer;
 }
@@ -608,12 +667,15 @@ textarea:focus-visible {
   margin: 12px auto;
   padding: 10px 14px;
   text-align: center;
-  background: var(--card);
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-edge);
   border-left: 4px solid var(--seal-light);
-  border-radius: 8px;
+  border-radius: 12px;
 }
 
-/* Photo grid: each photo looks like a little print on paper */
+/* Photo grid: each photo sits in a glass frame */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
@@ -625,13 +687,13 @@ textarea:focus-visible {
   margin: 0;
   padding: 8px 8px 10px;
   color: var(--ink);
-  background: var(--paper);
-  border-radius: 3px;
-  box-shadow: 0 14px 30px -12px rgba(0, 0, 0, 0.6);
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-edge);
+  border-radius: 14px;
+  box-shadow: var(--glass-shadow);
 }
-
-.photo:nth-child(odd)  { transform: rotate(-1.2deg); }
-.photo:nth-child(even) { transform: rotate(1deg); }
 
 /* The picture itself is a button, so it opens with keyboard or touch too */
 .photo .open {
@@ -640,7 +702,8 @@ textarea:focus-visible {
   padding: 0;
   background: none;
   border: 0;
-  border-radius: 0;
+  border-radius: 8px;
+  overflow: hidden;
   cursor: zoom-in;
 }
 
@@ -671,12 +734,12 @@ textarea:focus-visible {
 .photo .del {
   padding: 2px 10px;
   font-size: 0.85rem;
-  color: var(--seal);
-  border-color: var(--seal);
+  color: var(--error);
+  border-color: rgba(255, 179, 191, 0.6);
 }
 
 .photo .del:hover {
-  background: rgba(158, 27, 50, 0.1);
+  background: rgba(255, 179, 191, 0.18);
 }
 
 /* Full-size view when you click a photo */
@@ -696,6 +759,6 @@ textarea:focus-visible {
   display: block;
   max-width: 95vw;
   max-height: 90vh;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: zoom-out;
 }
