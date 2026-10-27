@@ -11,6 +11,7 @@ from flask import (
 
 import db
 import drive_store
+import movies
 import planner
 
 app = Flask(__name__)
@@ -263,6 +264,50 @@ def planner_delete(task_id):
 def planner_clear():
     planner.clear_done()
     return redirect(url_for("planner_page"))
+
+
+# ---------- Movie checklist (Maryan and Mariah) ----------
+
+@app.get("/movies")
+@login_required
+def movies_page():
+    return render_template("movies.html", board=movies.board())
+
+
+@app.post("/movies/add")
+@login_required
+def movies_add():
+    if not movies.add_movie(request.form.get("title", ""), who_is_logged_in()):
+        flash("Write the movie first.")
+    return redirect(url_for("movies_page"))
+
+
+@app.post("/movies/toggle/<movie_id>")
+@login_required
+def movie_toggle(movie_id):
+    movies.toggle_movie(movie_id)
+    return redirect(url_for("movies_page"))
+
+
+@app.post("/movies/rate/<movie_id>")
+@login_required
+def movie_rate(movie_id):
+    movies.rate_movie(movie_id, request.form.get("rating", "0"))
+    return redirect(url_for("movies_page"))
+
+
+@app.post("/movies/delete/<movie_id>")
+@login_required
+def movie_delete(movie_id):
+    movies.delete_movie(movie_id)
+    return redirect(url_for("movies_page"))
+
+
+@app.post("/movies/clear-watched")
+@login_required
+def movie_clear():
+    movies.clear_watched()
+    return redirect(url_for("movies_page"))
 
 
 # ---------- Gallery (Maryan and Mariah) ----------

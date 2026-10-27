@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Our Movie Checklist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Cormorant+Garamond:ital,wght@0,500;1,500;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+{% macro movie_row(m, watched) %}
+  <li class="task{% if watched %} done{% endif %}">
+    <form class="inline" method="post" action="{{ url_for('movie_toggle', movie_id=m['id']) }}">
+      <button type="submit" class="check" aria-label="{{ 'Move back to the watchlist' if watched else 'Mark as watched' }}">{% if watched %}✓{% endif %}</button>
+    </form>
+    <div class="what">
+      <span class="title">{{ m['title'] }}</span>
+      <small>added by {{ m['by'] }}</small>
+    </div>
+    {% if watched %}
+      <form class="stars" method="post" action="{{ url_for('movie_rate', movie_id=m['id']) }}" aria-label="Rate this movie">
+        {% for n in range(1, 6) %}
+          <button type="submit" name="rating" value="{{ n }}" class="star{% if m['rating'] >= n %} on{% endif %}" aria-label="Rate {{ n }} of 5 stars">★</button>
+        {% endfor %}
+      </form>
+    {% endif %}
+    <form class="inline" method="post" action="{{ url_for('movie_delete', movie_id=m['id']) }}" onsubmit="return confirm('Remove this movie?')">
+      <button type="submit" class="x" aria-label="Delete movie">Delete</button>
+    </form>
+  </li>
+{% endmacro %}
+
+<main>
+  <p class="who"><a href="{{ url_for('home') }}">Back to letters</a> · <a href="{{ url_for('logout') }}">Log out</a></p>
+  <h1>Our Movie Checklist</h1>
+  <p class="sub">Films to watch together, and the ones we’ve loved.</p>
+
+  <form class="add" method="post" action="{{ url_for('movies_add') }}">
+    <input type="text" name="title" placeholder="What should we watch?" maxlength="200" autocomplete="off" required aria-label="Movie title">
+    <button type="submit" class="primary">Add</button>
+  </form>
+
+  {% with messages = get_flashed_messages() %}
+    {% for m in messages %}
+      <p class="note" role="status">{{ m }}</p>
+    {% endfor %}
+  {% endwith %}
+
+  {% if board['to_watch'] or board['watched'] %}
+    <p class="progress">{{ board['to_watch_count'] }} to watch · {{ board['watched_count'] }} watched</p>
+  {% else %}
+    <p class="empty" style="text-align:center;margin-top:32px">No movies yet. Add the first one above.</p>
+  {% endif %}
+
+  {% if board['to_watch'] %}
+    <section class="day">
+      <h3>To watch</h3>
+      <ul class="tasks">
+        {% for m in board['to_watch'] %}{{ movie_row(m, false) }}{% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+
+  {% if board['watched'] %}
+    <h2>Watched</h2>
+    <ul class="tasks">
+      {% for m in board['watched'] %}{{ movie_row(m, true) }}{% endfor %}
+    </ul>
+    <form class="clear" method="post" action="{{ url_for('movie_clear') }}" onsubmit="return confirm('Remove all watched movies?')">
+      <button type="submit">Clear watched</button>
+    </form>
+  {% endif %}
+</main>
+
+<script>
+  // Keeps your place on the page after ticking, rating or deleting a movie
+  document.addEventListener('submit', function () {
+    try { sessionStorage.setItem('moviesY', String(window.scrollY)); } catch (e) {}
+  });
+  try {
+    var y = sessionStorage.getItem('moviesY');
+    if (y !== null) {
+      window.scrollTo(0, Number(y));
+      sessionStorage.removeItem('moviesY');
+    }
+  } catch (e) {}
+</script>
+</body>
+</html>

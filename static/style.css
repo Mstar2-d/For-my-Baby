@@ -355,12 +355,12 @@ textarea:focus-visible {
    5. TOP MENU AND ACTION BUTTONS
    ========================================================================== */
 
-/* The Gallery and Planner buttons under the title */
+/* The Gallery, Planner and Movies buttons under the title */
 .nav {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
-  max-width: 420px;
+  max-width: 560px;
   margin: 0 auto 22px;
 }
 
@@ -966,7 +966,38 @@ textarea:focus-visible {
 
 
 /* ==========================================================================
-   12. PRINT
+   12. MOVIE CHECKLIST
+   ========================================================================== */
+
+/* Row of five stars you tap to rate a watched movie */
+.stars {
+  display: flex;
+  flex: none;
+  gap: 2px;
+}
+
+.stars .star {
+  padding: 0 2px;
+  font-size: 1.3rem;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.35);
+  background: none;
+  border: 0;
+  border-radius: 6px;
+}
+
+.stars .star:hover {
+  background: none;
+  color: #f5c451;
+}
+
+.stars .star.on {
+  color: #f5c451;
+}
+
+
+/* ==========================================================================
+   13. PRINT
    ========================================================================== */
 
 /* When printing: plain white page with dark writing, only the letter */
@@ -1015,7 +1046,7 @@ textarea:focus-visible {
 
 
 /* ==========================================================================
-   13. PHONES AND TOUCH SCREENS
+   14. PHONES AND TOUCH SCREENS
    This section is last on purpose: it overrides the rules above on small screens.
    ========================================================================== */
 
@@ -1032,6 +1063,12 @@ textarea:focus-visible {
 
   h2 {
     margin-top: 34px;
+  }
+
+  /* Section buttons fall into two per row on phones */
+  .nav {
+    grid-template-columns: 1fr 1fr;
+    max-width: 420px;
   }
 
   /* Panels get a bit less padding so there's more room for writing */
