@@ -1,23 +1,21 @@
 import hmac
-import json
 import os
 import random
 import uuid
 from datetime import datetime
 from functools import wraps
-from pathlib import Path
 
 from flask import (
     Flask, Response, abort, flash, redirect, render_template, request, session, url_for,
 )
 
+import db
 import drive_store
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "local-dev-key-change-me")
 app.config["MAX_CONTENT_LENGTH"] = 40 * 1024 * 1024   # total size of one upload
 
-DATA = Path(__file__).with_name("letters.json")
 HER_NAME = "Mariah"
 MY_NAME = "Maryan"
 
@@ -39,16 +37,8 @@ SPARKS = [
     "Thank her for something she doesn’t know changed you.",
 ]
 
-
-def load_letters():
-    try:
-        return json.loads(DATA.read_text(encoding="utf-8"))
-    except (FileNotFoundError, json.JSONDecodeError):
-        return []
-
-
-def save_letters(letters):
-    DATA.write_text(json.dumps(letters, ensure_ascii=False, indent=2), encoding="utf-8")
+# Creates the letters table the first time the site starts
+db.init_db()
 
 
 def long_date():
@@ -110,7 +100,7 @@ def page(letter=None, sealed=False, message=None):
     return render_template(
         "index.html",
         letter=letter,
-        letters=load_letters(),
+        letters=db.load_letters(),
         sealed=sealed,
         message=message,
         today=long_date(),
@@ -159,17 +149,16 @@ def home():
 @app.get("/read")
 @role_required("reader")
 def read_list():
-    return render_template("read.html", letters=load_letters(), letter=None, her=HER_NAME, me=MY_NAME)
+    return render_template("read.html", letters=db.load_letters(), letter=None, her=HER_NAME, me=MY_NAME)
 
 
 @app.get("/read/<letter_id>")
 @role_required("reader")
 def read_letter(letter_id):
-    letters = load_letters()
-    for letter in letters:
-        if letter["id"] == letter_id:
-            return render_template("read.html", letters=letters, letter=letter, her=HER_NAME, me=MY_NAME)
-    return redirect(url_for("read_list"))
+    letter = db.get_letter(letter_id)
+    if not letter:
+        return redirect(url_for("read_list"))
+    return render_template("read.html", letters=db.load_letters(), letter=letter, her=HER_NAME, me=MY_NAME)
 
 
 # ---------- Writer (Maryan) ----------
@@ -177,35 +166,25 @@ def read_letter(letter_id):
 @app.get("/letter/<letter_id>")
 @role_required("writer")
 def open_letter(letter_id):
-    for letter in load_letters():
-        if letter["id"] == letter_id:
-            letter["to"] = HER_NAME
-            letter["sender"] = MY_NAME
-            return page(letter)
-    return redirect(url_for("home"))
+    letter = db.get_letter(letter_id)
+    if not letter:
+        return redirect(url_for("home"))
+    letter["to"] = HER_NAME
+    letter["sender"] = MY_NAME
+    return page(letter)
 
 
 @app.post("/save")
 @role_required("writer")
 def save_letter():
     letter = form_letter()
-    letter["to"] = HER_NAME
-    letter["sender"] = MY_NAME
     if not letter["body"].strip():
         return page(letter, message="Write a few words before sealing")
 
-    letters = load_letters()
-    letter_id = letter["id"] or uuid.uuid4().hex[:10]
-    record = {**letter, "id": letter_id, "date": short_date()}
+    letter["id"] = letter["id"] or uuid.uuid4().hex[:10]
+    letter["date"] = short_date()
+    db.save_letter(letter)
 
-    for i, existing in enumerate(letters):
-        if existing["id"] == letter_id:
-            letters[i] = record
-            break
-    else:
-        letters.insert(0, record)
-
-    save_letters(letters)
     # Back to a blank page so you can write the next letter
     return redirect(url_for("home", sealed=1))
 
@@ -214,8 +193,6 @@ def save_letter():
 @role_required("writer")
 def spark():
     letter = form_letter()
-    letter["to"] = HER_NAME
-    letter["sender"] = MY_NAME
     prompt = random.choice(SPARKS)
     prefix = letter["body"].rstrip() + "\n\n" if letter["body"].strip() else ""
     letter["body"] = prefix + prompt + " "
@@ -225,8 +202,16 @@ def spark():
 @app.post("/delete/<letter_id>")
 @role_required("writer")
 def delete_letter(letter_id):
-    save_letters([l for l in load_letters() if l["id"] != letter_id])
+    db.delete_letter(letter_id)
     return redirect(url_for("home"))
+
+
+# ---------- Database check (temporary: delete this when you're done testing) ----------
+
+@app.get("/dbcheck")
+@role_required("writer")
+def dbcheck():
+    return f"Database: {db.engine.dialect.name} | Letters: {len(db.load_letters())}"
 
 
 # ---------- Gallery (Maryan and Mariah) ----------
