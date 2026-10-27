@@ -1,6 +1,6 @@
 """Photo storage for the gallery.
 
-Uses Google Drive when the three GOOGLE_* environment variables are set.
+Uses a Google Drive folder when the three GOOGLE_* environment variables are set.
 Otherwise photos are saved in a local "uploads" folder (handy for testing).
 """
 import io
@@ -12,7 +12,12 @@ from pathlib import Path
 
 from PIL import Image, ImageOps
 
-FOLDER_NAME = "Dear You Gallery"   # the folder created in Google Drive
+# The Google Drive folder where photos live.
+# This is the part of the folder's link after /folders/
+# You can override it with a GOOGLE_FOLDER_ID environment variable.
+FOLDER_ID = os.environ.get("GOOGLE_FOLDER_ID", "124LLdhM0X3g9lRm4x_TKKVz4sA3mEURX")
+
+SCOPES = ["https://www.googleapis.com/auth/drive"]
 MAX_MB = 10                        # biggest file accepted
 MAX_SIDE = 1600                    # photos are shrunk so the longest side is this many pixels
 LOCAL_DIR = Path(os.environ.get("DATA_DIR", Path(__file__).parent)) / "uploads"
@@ -66,6 +71,7 @@ def _info(photo_id, name):
         when = datetime.strptime(stamp, "%Y%m%d%H%M%S")
         date = f"{when.strftime('%b')} {when.day}, {when.year}"
     except ValueError:
+        # Photos dropped into the folder by hand have no uploader or date
         who, date = "", ""
     return {"id": photo_id, "by": who, "date": date}
 
@@ -73,7 +79,6 @@ def _info(photo_id, name):
 # ---------- Google Drive ----------
 
 _service = None
-_folder_id = None
 
 
 def _drive():
@@ -88,29 +93,10 @@ def _drive():
             client_id=os.environ["GOOGLE_CLIENT_ID"],
             client_secret=os.environ["GOOGLE_CLIENT_SECRET"],
             token_uri="https://oauth2.googleapis.com/token",
-            scopes=["https://www.googleapis.com/auth/drive.file"],
+            scopes=SCOPES,
         )
         _service = build("drive", "v3", credentials=creds, cache_discovery=False)
     return _service
-
-
-def _folder():
-    """Finds the gallery folder in Drive, or creates it the first time."""
-    global _folder_id
-    if _folder_id:
-        return _folder_id
-    query = (
-        f"name = '{FOLDER_NAME}' and trashed = false "
-        "and mimeType = 'application/vnd.google-apps.folder'"
-    )
-    found = _drive().files().list(q=query, fields="files(id)", pageSize=1).execute()
-    files = found.get("files", [])
-    if files:
-        _folder_id = files[0]["id"]
-    else:
-        meta = {"name": FOLDER_NAME, "mimeType": "application/vnd.google-apps.folder"}
-        _folder_id = _drive().files().create(body=meta, fields="id").execute()["id"]
-    return _folder_id
 
 
 # ---------- What main.py uses ----------
@@ -119,7 +105,7 @@ def list_photos():
     """Newest first."""
     if drive_enabled():
         result = _drive().files().list(
-            q=f"'{_folder()}' in parents and trashed = false",
+            q=f"'{FOLDER_ID}' in parents and trashed = false and mimeType contains 'image/'",
             fields="files(id,name)",
             orderBy="name desc",
             pageSize=200,
@@ -139,7 +125,7 @@ def save_photo(data, uploader):
         from googleapiclient.http import MediaIoBaseUpload
 
         media = MediaIoBaseUpload(io.BytesIO(jpeg), mimetype="image/jpeg")
-        meta = {"name": name, "parents": [_folder()]}
+        meta = {"name": name, "parents": [FOLDER_ID]}
         _drive().files().create(body=meta, media_body=media, fields="id").execute()
     else:
         LOCAL_DIR.mkdir(parents=True, exist_ok=True)
