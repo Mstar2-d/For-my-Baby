@@ -11,6 +11,7 @@
      8. Reader page
      9. Print and small screens
     10. Gallery
+    11. Planner
    ========================================================================== */
 
 
@@ -20,10 +21,10 @@
    ========================================================================== */
 
 :root {
-  /* Page background: blue to purple, with your photo strips on top */
-  --bg-blue:   #1b2a74;
-  --bg-purple: #4a1f7c;
-  --bg-glow:   rgba(140, 118, 235, 0.35);
+  /* Page background: Soft Periwinkle, with your photo strips on top */
+  --bg-blue:   #4a5bd0;
+  --bg-purple: #9a63d6;
+  --bg-glow:   rgba(255, 255, 255, 0.25);
 
   /* Text */
   --text:   #ffffff;
@@ -307,7 +308,7 @@ button:disabled {
   cursor: wait;
 }
 
-/* Main action ("Seal and keep", "Log in", "Gallery") */
+/* Main action ("Seal and keep", "Log in", "Gallery", "Planner") */
 button.primary {
   font-weight: 600;
   color: #fff;
@@ -762,6 +763,7 @@ textarea:focus-visible {
   border-radius: 8px;
   cursor: zoom-out;
 }
+
 
 /* ==========================================================================
    11. PLANNER
