@@ -13,6 +13,7 @@ import db
 import drive_store
 import movies
 import planner
+import schedule_pics
 import timetable
 
 app = Flask(__name__)
@@ -181,6 +182,7 @@ def schedule_page():
     return render_template(
         "schedule.html",
         board=timetable.board(WHO_FILTERS.get(view)),
+        pics=schedule_pics.list_pics(WHO_FILTERS.get(view)),
         view=view,
         tabs=[("", "Both"), ("maryan", MY_NAME), ("mariah", HER_NAME)],
         names=[MY_NAME, HER_NAME],
@@ -228,6 +230,63 @@ def schedule_edit(class_id):
 @login_required
 def schedule_delete(class_id):
     timetable.delete_class(class_id)
+    return redirect(schedule_url())
+
+
+# ---------- Schedule pictures (Maryan and Mariah) ----------
+
+@app.post("/schedule/pics/upload")
+@login_required
+def schedule_pic_upload():
+    who = who_is_logged_in()
+    label = request.form.get("label", "")
+    files = [f for f in request.files.getlist("pics") if f and f.filename]
+    if not files:
+        flash("Choose a picture first.")
+        return redirect(schedule_url())
+
+    added = skipped = 0
+    for f in files:
+        try:
+            schedule_pics.save_pic(f.read(), who, label)
+            added += 1
+        except schedule_pics.BadImage:
+            skipped += 1
+        except Exception:
+            app.logger.exception("Schedule picture upload failed")
+            flash("Couldn’t save the picture. Please try again in a moment.")
+            return redirect(schedule_url())
+
+    if added:
+        flash(f"{added} {'picture' if added == 1 else 'pictures'} posted.")
+    if skipped:
+        flash(f"{skipped} skipped. Only JPG, PNG or WebP pictures up to {schedule_pics.MAX_MB} MB work.")
+    return redirect(schedule_url())
+
+
+@app.get("/schedule/pics/<pic_id>")
+@login_required
+def schedule_pic_view(pic_id):
+    try:
+        data = schedule_pics.get_pic(pic_id)
+    except Exception:
+        app.logger.exception("Could not load a schedule picture")
+        data = None
+    if data is None:
+        abort(404)
+    response = Response(data, mimetype="image/jpeg")
+    response.headers["Cache-Control"] = "private, max-age=86400"
+    return response
+
+
+@app.post("/schedule/pics/delete/<pic_id>")
+@login_required
+def schedule_pic_delete(pic_id):
+    try:
+        schedule_pics.delete_pic(pic_id)
+    except Exception:
+        app.logger.exception("Could not delete a schedule picture")
+        flash("Couldn’t delete that picture. Please try again.")
     return redirect(schedule_url())
 
 
@@ -523,7 +582,9 @@ def delete_photo(photo_id):
 
 @app.errorhandler(413)
 def too_big(error):
-    flash("That upload is too large. Try fewer photos at a time.")
+    flash("That upload is too large. Try fewer or smaller pictures at a time.")
+    if request.path.startswith("/schedule"):
+        return redirect(url_for("schedule_page"))
     return redirect(url_for("gallery"))
 
 

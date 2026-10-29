@@ -73,7 +73,7 @@
     </form>
   </nav>
 
-  <nav class="tabs" aria-label="Whose classes">
+  <nav class="tabs" aria-label="Whose schedule">
     {% for key, label in tabs %}
       <a href="{{ url_for('schedule_page', who=key) if key else url_for('schedule_page') }}" class="{{ 'on' if view == key }}">{{ label }}</a>
     {% endfor %}
@@ -84,6 +84,48 @@
       <p class="note" role="status">{{ m }}</p>
     {% endfor %}
   {% endwith %}
+
+  <section class="panel pics" aria-label="Schedule pictures">
+    <h2>Schedule pictures</h2>
+    <p class="panel-sub">Post a photo or screenshot of your schedule. Tap one to open it full size.</p>
+
+    {% if pics %}
+      <div class="picgrid">
+        {% for p in pics %}
+          <figure class="pic">
+            <a href="{{ url_for('schedule_pic_view', pic_id=p['id']) }}" target="_blank" rel="noopener" aria-label="Open {{ p['owner'] }}’s schedule picture full size">
+              <img src="{{ url_for('schedule_pic_view', pic_id=p['id']) }}" alt="{{ p['owner'] }}’s schedule" loading="lazy">
+            </a>
+            <figcaption>
+              <span><span class="chip {{ p['owner']|lower }}">{{ p['owner'] }}</span>{% if p['label'] %} {{ p['label'] }}{% endif %}{% if p['date'] %} · {{ p['date'] }}{% endif %}</span>
+              <form class="inline" method="post" action="{{ url_for('schedule_pic_delete', pic_id=p['id']) }}" onsubmit="return confirm('Delete this picture?')">
+                <input type="hidden" name="view" value="{{ view }}">
+                <button type="submit" class="del" aria-label="Delete picture">Delete</button>
+              </form>
+            </figcaption>
+          </figure>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="empty">No pictures yet. Post the first one below.</p>
+    {% endif %}
+
+    <details class="edit-class pic-add">
+      <summary>＋ Post a picture</summary>
+      <form class="sform" method="post" action="{{ url_for('schedule_pic_upload') }}" enctype="multipart/form-data" id="picForm">
+        <input type="hidden" name="view" value="{{ view }}">
+        <label class="wide">Picture (JPG, PNG or WebP, up to 10 MB)
+          <input type="file" name="pics" accept="image/jpeg,image/png,image/webp" multiple required>
+        </label>
+        <label class="wide">Label
+          <input type="text" name="label" maxlength="60" placeholder="optional, like Week of Nov 3" autocomplete="off">
+        </label>
+        <div class="btns">
+          <button type="submit" class="primary" id="picBtn">Post</button>
+        </div>
+      </form>
+    </details>
+  </section>
 
   <section class="panel" aria-label="Today">
     <h2>Today</h2>
@@ -97,7 +139,7 @@
         {% endfor %}
       </ul>
     {% elif board['total'] == 0 %}
-      <p class="empty">No classes yet. Add the first one below.</p>
+      <p class="empty">No classes typed in yet. Add the first one below.</p>
     {% else %}
       <p class="empty">No classes today. Enjoy the day.</p>
     {% endif %}
@@ -147,7 +189,7 @@
 </main>
 
 <script>
-  // Keeps your place on the page after saving or deleting a class
+  // Keeps your place on the page after saving or deleting
   document.addEventListener('submit', function () {
     try { sessionStorage.setItem('scheduleY', String(window.scrollY)); } catch (e) {}
   });
@@ -158,6 +200,16 @@
       sessionStorage.removeItem('scheduleY');
     }
   } catch (e) {}
+
+  // Stops double posting while a picture uploads
+  var picForm = document.getElementById('picForm');
+  if (picForm) {
+    picForm.addEventListener('submit', function () {
+      var btn = document.getElementById('picBtn');
+      btn.disabled = true;
+      btn.textContent = 'Posting…';
+    });
+  }
 </script>
 </body>
 </html>
