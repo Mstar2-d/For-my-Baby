@@ -12,8 +12,10 @@
      9. Reader page
     10. Gallery
     11. Planner
-    12. Print
-    13. Phones and touch screens (always last, so it wins)
+    12. Movie checklist
+    13. Replies
+    14. Print
+    15. Phones and touch screens (always last, so it wins)
    ========================================================================== */
 
 
@@ -374,7 +376,7 @@ textarea:focus-visible {
 }
 
 /* "I need a spark", "Print" and "Seal and keep" under the letter.
-   On a computer they sit in a row; section 13 stacks them on phones. */
+   On a computer they sit in a row; the phones section stacks them. */
 .actions {
   justify-content: center;
 }
@@ -1034,7 +1036,91 @@ textarea:focus-visible {
 
 
 /* ==========================================================================
-   13. PRINT
+   13. REPLIES
+   Mariah's replies under each letter.
+   ========================================================================== */
+
+/* The little "💬 2" next to a letter's title */
+.badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 9px;
+  font-size: 0.85rem;
+  font-weight: 400;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid var(--glass-edge);
+  border-radius: 999px;
+}
+
+/* The replies area under a letter */
+.replies {
+  margin-top: 8px;
+}
+
+/* One reply, as a glass card with handwriting */
+.reply {
+  margin-bottom: 10px;
+  padding: 14px 16px;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-edge);
+  border-radius: 14px;
+  box-shadow: var(--glass-shadow);
+}
+
+.reply p {
+  margin: 0;
+  white-space: pre-wrap;          /* keeps the line breaks she typed */
+  overflow-wrap: anywhere;
+  font-family: Caveat, cursive, sans-serif;
+  font-size: 1.5rem;
+  line-height: 1.35;
+}
+
+.reply .meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.reply .x {
+  padding: 2px 10px;
+  font-size: 0.85rem;
+  color: var(--error);
+  border-color: rgba(255, 179, 191, 0.6);
+}
+
+.reply .x:hover {
+  background: rgba(255, 179, 191, 0.18);
+}
+
+/* The box where Mariah types her reply (a plain glass box, no ruled lines) */
+textarea.reply-text {
+  min-height: 130px;
+  margin-top: 4px;
+  padding: 12px 14px;
+  font-size: 1.5rem;
+  line-height: 1.35;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-edge);
+  border-radius: 14px;
+}
+
+textarea.reply-text:focus {
+  outline: 2px solid var(--seal-light);
+  outline-offset: 3px;
+  border-color: var(--glass-edge);
+}
+
+
+/* ==========================================================================
+   14. PRINT
    ========================================================================== */
 
 /* When printing: plain white page with dark writing, only the letter */
@@ -1057,6 +1143,7 @@ textarea:focus-visible {
   .nav,
   .bar,
   .shelf,
+  .replies,
   .foot button,
   .who,
   h1,
@@ -1083,7 +1170,7 @@ textarea:focus-visible {
 
 
 /* ==========================================================================
-   14. PHONES AND TOUCH SCREENS
+   15. PHONES AND TOUCH SCREENS
    This section is last on purpose: it overrides the rules above on small screens.
    ========================================================================== */
 
@@ -1129,6 +1216,16 @@ textarea:focus-visible {
   textarea,
   .letter-view {
     font-size: 1.5rem;
+  }
+
+  /* Replies */
+  .reply p {
+    font-size: 1.4rem;
+  }
+
+  textarea.reply-text {
+    min-height: 110px;
+    font-size: 1.4rem;
   }
 
   /* "Seal and keep" is a full-width button on top;
@@ -1194,7 +1291,8 @@ textarea:focus-visible {
 
   .item button,
   .photo .del,
-  .task .x {
+  .task .x,
+  .reply .x {
     min-height: 38px;
     padding: 4px 14px;
   }

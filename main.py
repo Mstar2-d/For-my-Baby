@@ -20,6 +20,7 @@ app.config["MAX_CONTENT_LENGTH"] = 40 * 1024 * 1024   # total size of one upload
 
 HER_NAME = "Mariah"
 MY_NAME = "Maryan"
+MAX_REPLY = 2000   # longest reply, in characters
 
 # The password decides who gets in.
 # On Render, set WRITER_PASSWORD and READER_PASSWORD so they aren't in your code.
@@ -39,7 +40,7 @@ SPARKS = [
     "Thank her for something she doesn’t know changed you.",
 ]
 
-# Creates the letters table the first time the site starts
+# Creates the letters and replies tables the first time the site starts
 db.init_db()
 
 
@@ -107,11 +108,14 @@ def page(letter=None, sealed=False, message=None):
         "index.html",
         letter=letter,
         letters=db.load_letters(),
+        replies=db.replies_for(letter["id"]) if letter.get("id") else [],
+        counts=db.reply_counts(),
         sealed=sealed,
         message=message,
         today=long_date(),
         words=len(letter["body"].split()),
         me=MY_NAME,
+        her=HER_NAME,
     )
 
 
@@ -155,7 +159,15 @@ def home():
 @app.get("/read")
 @role_required("reader")
 def read_list():
-    return render_template("read.html", letters=db.load_letters(), letter=None, her=HER_NAME, me=MY_NAME)
+    return render_template(
+        "read.html",
+        letters=db.load_letters(),
+        letter=None,
+        replies=[],
+        counts=db.reply_counts(),
+        her=HER_NAME,
+        me=MY_NAME,
+    )
 
 
 @app.get("/read/<letter_id>")
@@ -164,7 +176,35 @@ def read_letter(letter_id):
     letter = db.get_letter(letter_id)
     if not letter:
         return redirect(url_for("read_list"))
-    return render_template("read.html", letters=db.load_letters(), letter=letter, her=HER_NAME, me=MY_NAME)
+    return render_template(
+        "read.html",
+        letters=db.load_letters(),
+        letter=letter,
+        replies=db.replies_for(letter_id),
+        counts=db.reply_counts(),
+        her=HER_NAME,
+        me=MY_NAME,
+    )
+
+
+@app.post("/reply/<letter_id>")
+@role_required("reader")
+def send_reply(letter_id):
+    if not db.get_letter(letter_id):
+        return redirect(url_for("read_list"))
+    body = request.form.get("body", "").strip()[:MAX_REPLY]
+    if body:
+        db.add_reply(letter_id, body, short_date())
+    else:
+        flash("Write your reply first.")
+    return redirect(url_for("read_letter", letter_id=letter_id, _anchor="replies"))
+
+
+@app.post("/reply/delete/<letter_id>/<reply_id>")
+@role_required("reader")
+def remove_reply(letter_id, reply_id):
+    db.delete_reply(letter_id, reply_id)
+    return redirect(url_for("read_letter", letter_id=letter_id, _anchor="replies"))
 
 
 # ---------- Writer (Maryan) ----------

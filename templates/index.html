@@ -53,16 +53,28 @@
     </div>
   </form>
 
+  {% if replies %}
+    <section class="replies" id="replies">
+      <h2>{{ 'Reply' if replies|length == 1 else 'Replies' }} from {{ her }}</h2>
+      {% for r in replies %}
+        <div class="reply">
+          <p>{{ r['body'] }}</p>
+          <div class="meta"><span>{{ her }} · {{ r['date'] }}</span></div>
+        </div>
+      {% endfor %}
+    </section>
+  {% endif %}
+
   <h2>Your letters</h2>
   <div class="shelf">
     {% for l in letters %}
       <div class="item">
         <div class="dot"></div>
         <a class="t" href="{{ url_for('open_letter', letter_id=l['id']) }}" style="color:inherit;text-decoration:none">
-          <b>To Mariah · {{ l['date'] }}</b>
+          <b>To Mariah · {{ l['date'] }}{% if counts.get(l['id']) %}<small class="badge">💬 {{ counts[l['id']] }}</small>{% endif %}</b>
           <span>{{ l['body'] }}</span>
         </a>
-        <form class="inline" method="post" action="{{ url_for('delete_letter', letter_id=l['id']) }}" onsubmit="return confirm('Delete this letter for good?')">
+        <form class="inline" method="post" action="{{ url_for('delete_letter', letter_id=l['id']) }}" onsubmit="return confirm('Delete this letter and its replies for good?')">
           <button type="submit" aria-label="Delete letter">Delete</button>
         </form>
       </div>
