@@ -13,6 +13,7 @@ import db
 import drive_store
 import movies
 import planner
+import timetable
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "local-dev-key-change-me")
@@ -21,6 +22,9 @@ app.config["MAX_CONTENT_LENGTH"] = 40 * 1024 * 1024   # total size of one upload
 HER_NAME = "Mariah"
 MY_NAME = "Maryan"
 MAX_REPLY = 2000   # longest reply, in characters
+
+# The tabs on the schedule page: web address word -> whose classes to show
+WHO_FILTERS = {"maryan": MY_NAME, "mariah": HER_NAME}
 
 # The password decides who gets in.
 # On Render, set WRITER_PASSWORD and READER_PASSWORD so they aren't in your code.
@@ -124,7 +128,7 @@ def page(letter=None, sealed=False, message=None):
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if session.get("role") in ("writer", "reader"):
-        return redirect(url_for("home"))
+        return redirect(url_for("schedule_page"))
 
     error = None
     if request.method == "POST":
@@ -132,7 +136,7 @@ def login():
         if role:
             session.clear()
             session["role"] = role
-            return redirect(url_for("home"))
+            return redirect(url_for("schedule_page"))
         error = "That password doesn’t match. Try again."
 
     return render_template("login.html", error=error)
@@ -146,11 +150,94 @@ def logout():
 
 @app.get("/")
 def home():
-    role = session.get("role")
-    if role == "reader":
-        return redirect(url_for("read_list"))
-    if role != "writer":
+    """The front door: after logging in, the schedule dashboard comes first."""
+    if session.get("role") not in ("writer", "reader"):
         return redirect(url_for("login"))
+    return redirect(url_for("schedule_page"))
+
+
+# ---------- Schedule dashboard (Maryan and Mariah) ----------
+
+def schedule_url():
+    """Goes back to the schedule, keeping whichever tab was open."""
+    view = request.form.get("view", "")
+    if view in WHO_FILTERS:
+        return url_for("schedule_page", who=view)
+    return url_for("schedule_page")
+
+
+def class_owner():
+    """Whose class it is. Anything unexpected falls back to the person logged in."""
+    owner = request.form.get("owner", "")
+    return owner if owner in (MY_NAME, HER_NAME) else who_is_logged_in()
+
+
+@app.get("/schedule")
+@login_required
+def schedule_page():
+    view = request.args.get("who", "")
+    if view not in WHO_FILTERS:
+        view = ""
+    return render_template(
+        "schedule.html",
+        board=timetable.board(WHO_FILTERS.get(view)),
+        view=view,
+        tabs=[("", "Both"), ("maryan", MY_NAME), ("mariah", HER_NAME)],
+        names=[MY_NAME, HER_NAME],
+        day_names=timetable.DAYS,
+        me=who_is_logged_in(),
+    )
+
+
+@app.post("/schedule/add")
+@login_required
+def schedule_add():
+    error = timetable.add_class(
+        class_owner(),
+        request.form.get("day", ""),
+        request.form.get("start", ""),
+        request.form.get("end", ""),
+        request.form.get("subject", ""),
+        request.form.get("room", ""),
+        request.form.get("notes", ""),
+    )
+    if error:
+        flash(error)
+    return redirect(schedule_url())
+
+
+@app.post("/schedule/edit/<class_id>")
+@login_required
+def schedule_edit(class_id):
+    error = timetable.update_class(
+        class_id,
+        class_owner(),
+        request.form.get("day", ""),
+        request.form.get("start", ""),
+        request.form.get("end", ""),
+        request.form.get("subject", ""),
+        request.form.get("room", ""),
+        request.form.get("notes", ""),
+    )
+    if error:
+        flash(error)
+    return redirect(schedule_url())
+
+
+@app.post("/schedule/delete/<class_id>")
+@login_required
+def schedule_delete(class_id):
+    timetable.delete_class(class_id)
+    return redirect(schedule_url())
+
+
+# ---------- Letters: the writer's page (Maryan) ----------
+
+@app.get("/letters")
+@login_required
+def letters_home():
+    if session.get("role") == "reader":
+        return redirect(url_for("read_list"))
     return page(sealed=request.args.get("sealed") == "1")
 
 
@@ -214,7 +301,7 @@ def remove_reply(letter_id, reply_id):
 def open_letter(letter_id):
     letter = db.get_letter(letter_id)
     if not letter:
-        return redirect(url_for("home"))
+        return redirect(url_for("letters_home"))
     letter["to"] = HER_NAME
     letter["sender"] = MY_NAME
     return page(letter)
@@ -232,7 +319,7 @@ def save_letter():
     db.save_letter(letter)
 
     # Back to a blank page so you can write the next letter
-    return redirect(url_for("home", sealed=1))
+    return redirect(url_for("letters_home", sealed=1))
 
 
 @app.post("/spark")
@@ -249,7 +336,7 @@ def spark():
 @role_required("writer")
 def delete_letter(letter_id):
     db.delete_letter(letter_id)
-    return redirect(url_for("home"))
+    return redirect(url_for("letters_home"))
 
 
 # ---------- Database check (temporary: delete this when you're done testing) ----------

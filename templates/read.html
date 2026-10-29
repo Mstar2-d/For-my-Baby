@@ -15,6 +15,9 @@
   <p class="sub">Every letter written for you.</p>
 
   <nav class="nav" aria-label="Sections">
+    <form method="get" action="{{ url_for('schedule_page') }}">
+      <button type="submit" class="primary">🗓 Schedule</button>
+    </form>
     <form method="get" action="{{ url_for('gallery') }}">
       <button type="submit" class="primary">📷 Gallery</button>
     </form>

@@ -1337,3 +1337,318 @@ textarea.reply-text:focus {
     padding: 10px 6px;
   }
 }
+/* ==========================================================================
+   16. SCHEDULE DASHBOARD
+   Pasted at the end on purpose, so it works together with the phones section above.
+   ========================================================================== */
+
+/* Four section buttons fit in one row on computers (phones keep two per row) */
+@media (min-width: 701px) {
+  .nav {
+    grid-template-columns: repeat(4, 1fr);
+    max-width: 640px;
+  }
+}
+
+/* Both / Maryan / Mariah tabs */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin: 0 0 18px;
+}
+
+.tabs a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 6px 18px;
+  color: var(--text);
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid var(--glass-edge);
+  border-radius: 999px;
+}
+
+.tabs a.on {
+  font-weight: 600;
+  background: var(--seal);
+  border-color: var(--seal-light);
+}
+
+/* Glass boxes: the Today card, the Add form and each day of the week */
+.panel,
+.dayblock {
+  padding: 16px 18px;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-edge);
+  border-radius: 18px;
+  box-shadow: var(--glass-shadow);
+}
+
+.panel > h2 {
+  margin: 0 0 2px;
+}
+
+.panel-sub {
+  margin: 0 0 12px;
+  font-style: italic;
+  opacity: 0.85;
+}
+
+.dayblock {
+  margin-top: 12px;
+}
+
+.dayblock h3 {
+  margin: 0 0 8px;
+  font-size: 1.35rem;
+  font-style: italic;
+  font-weight: 600;
+}
+
+.today-badge {
+  margin-left: 10px;
+  padding: 1px 11px;
+  font-size: 0.8rem;
+  font-style: normal;
+  font-weight: 600;
+  vertical-align: middle;
+  background: var(--seal);
+  border-radius: 999px;
+}
+
+/* The list of classes */
+.slots {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* One class: time on the left, subject on the right, coloured by person */
+.slot {
+  --c: #c9b8ff;
+  display: grid;
+  grid-template-columns: 90px minmax(0, 1fr);
+  gap: 4px 12px;
+  align-items: start;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-edge);
+  border-left: 5px solid var(--c);
+  border-radius: 12px;
+}
+
+.slot.maryan { --c: #8fc1ff; }
+.slot.mariah { --c: #ff9ccf; }
+
+.slot.done {
+  opacity: 0.55;
+}
+
+.slot.now {
+  background: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 0 0 2px var(--c);
+}
+
+.when b {
+  display: block;
+  font-size: 1.02rem;
+  line-height: 1.25;
+}
+
+.when span {
+  display: block;
+  font-size: 0.88rem;
+  opacity: 0.8;
+}
+
+.what {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.subject {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.what small {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.92rem;
+  opacity: 0.85;
+}
+
+/* The little name tag: Maryan (blue) and Mariah (pink) */
+.chip {
+  display: inline-block;
+  padding: 0 9px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #1c1646;
+  background: #c9b8ff;
+  border-radius: 999px;
+}
+
+.chip.maryan { background: #8fc1ff; }
+.chip.mariah { background: #ff9ccf; }
+
+/* Now / Next / Done tags next to today's subjects */
+.state {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 0 9px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  vertical-align: middle;
+  border-radius: 999px;
+}
+
+.state.now  { color: #fff; background: var(--seal); }
+.state.next { color: #2b2350; background: rgba(255, 255, 255, 0.92); }
+.state.done { background: rgba(255, 255, 255, 0.22); }
+
+/* Edit button and form inside a class */
+.slot-tools {
+  grid-column: 1 / -1;
+}
+
+.edit-class summary,
+.add-class > summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.edit-class summary::-webkit-details-marker,
+.add-class > summary::-webkit-details-marker {
+  display: none;
+}
+
+.edit-class summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 2px 16px;
+  font-size: 0.85rem;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid var(--glass-edge);
+  border-radius: 999px;
+}
+
+.add-class {
+  margin-top: 14px;
+}
+
+.add-class > summary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* The form used to add or change a class */
+.sform {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.sform label {
+  display: block;
+  font-size: 0.92rem;
+  color: var(--muted);
+}
+
+.sform .wide {
+  grid-column: 1 / -1;
+}
+
+.sform input,
+.sform select {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  margin-top: 4px;
+  padding: 9px 12px;
+  font: inherit;
+  font-size: 1.05rem;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-edge);
+  border-radius: 12px;
+  color-scheme: dark;   /* dark time picker and drop-down lists */
+}
+
+.sform input::placeholder {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.sform input:focus-visible,
+.sform select:focus-visible {
+  outline: 2px solid var(--seal-light);
+  outline-offset: 3px;
+}
+
+.sform .btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  grid-column: 1 / -1;
+}
+
+.sform .del {
+  color: var(--error);
+  border-color: rgba(255, 179, 191, 0.6);
+}
+
+/* Phones */
+@media (max-width: 700px) {
+  .panel,
+  .dayblock {
+    padding: 14px 12px;
+  }
+
+  .slot {
+    grid-template-columns: 76px minmax(0, 1fr);
+    gap: 4px 10px;
+  }
+
+  .subject {
+    font-size: 1.12rem;
+  }
+}
+
+/* Printing the schedule: plain white page, dark text, no buttons */
+@media print {
+  .tabs,
+  .add-class,
+  .slot-tools {
+    display: none;
+  }
+
+  .panel,
+  .dayblock {
+    background: none;
+    border: 1px solid #cccccc;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .dayblock h3 {
+    color: #222222;
+    text-shadow: none;
+  }
+}
