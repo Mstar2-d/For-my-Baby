@@ -72,7 +72,7 @@
         <div class="dot"></div>
         <a class="t" href="{{ url_for('open_letter', letter_id=l['id']) }}" style="color:inherit;text-decoration:none">
           <b>To Mariah · {{ l['date'] }}{% if counts.get(l['id']) %}<small class="badge">💬 {{ counts[l['id']] }}</small>{% endif %}</b>
-          <span>{{ l['body'] }}</span>
+          <span>{{ l['body']|replace('\n', ' ')|truncate(70, False, '…') }}</span>
         </a>
         <form class="inline" method="post" action="{{ url_for('delete_letter', letter_id=l['id']) }}" onsubmit="return confirm('Delete this letter and its replies for good?')">
           <button type="submit" aria-label="Delete letter">Delete</button>

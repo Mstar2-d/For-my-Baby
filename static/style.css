@@ -388,6 +388,7 @@ textarea:focus-visible {
 
 .shelf {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);   /* stops long text from stretching the page */
   gap: 10px;
 }
 
@@ -420,6 +421,7 @@ textarea:focus-visible {
   flex: 1;
   min-width: 0;
   cursor: pointer;
+  overflow-wrap: anywhere;
 }
 
 .item .t b {
@@ -883,6 +885,7 @@ textarea:focus-visible {
 
 .tasks {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);   /* stops long text from stretching the page */
   gap: 8px;
   margin: 0;
   padding: 0;
@@ -1245,10 +1248,33 @@ textarea.reply-text:focus {
     order: -1;
   }
 
-  /* Saved letters */
+  /* Saved letters: small, tidy cards with a one-line preview */
   .item {
     gap: 10px;
-    padding: 10px 12px;
+    padding: 8px 12px;
+    border-radius: 12px;
+  }
+
+  .item .dot {
+    width: 22px;
+    height: 22px;
+  }
+
+  .item .t b {
+    overflow: hidden;
+    font-size: 1rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .item .t span {
+    font-size: 0.88rem;
+  }
+
+  .shelf .item button {
+    min-height: 34px;
+    padding: 2px 12px;
+    font-size: 0.8rem;
   }
 
   /* Gallery: two photos per row */

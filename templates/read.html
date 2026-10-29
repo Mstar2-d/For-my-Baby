@@ -37,14 +37,43 @@
       <a href="{{ url_for('read_list') }}"><button type="button">All letters</button></a>
       <button type="button" onclick="window.print()">Print</button>
     </div>
+
+    <section class="replies" id="replies">
+      <h2>{{ 'Your reply' if replies|length == 1 else 'Your replies' if replies else 'Reply to this letter' }}</h2>
+
+      {% with messages = get_flashed_messages() %}
+        {% for m in messages %}
+          <p class="note" role="status">{{ m }}</p>
+        {% endfor %}
+      {% endwith %}
+
+      {% for r in replies %}
+        <div class="reply">
+          <p>{{ r['body'] }}</p>
+          <div class="meta">
+            <span>{{ her }} · {{ r['date'] }}</span>
+            <form class="inline" method="post" action="{{ url_for('remove_reply', letter_id=letter['id'], reply_id=r['id']) }}" onsubmit="return confirm('Delete this reply?')">
+              <button type="submit" class="x" aria-label="Delete reply">Delete</button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+
+      <form class="reply-form" method="post" action="{{ url_for('send_reply', letter_id=letter['id']) }}">
+        <textarea class="reply-text" name="body" placeholder="Write your reply…" maxlength="2000" required aria-label="Your reply"></textarea>
+        <div class="bar">
+          <button type="submit" class="primary">Send reply</button>
+        </div>
+      </form>
+    </section>
   {% else %}
     <div class="shelf">
       {% for l in letters %}
         <div class="item">
           <div class="dot"></div>
           <a class="t" href="{{ url_for('read_letter', letter_id=l['id']) }}" style="color:inherit;text-decoration:none">
-            <b>From {{ me }} · {{ l['date'] }}</b>
-            <span>{{ l['body'] }}</span>
+            <b>From {{ me }} · {{ l['date'] }}{% if counts.get(l['id']) %}<small class="badge">💬 {{ counts[l['id']] }}</small>{% endif %}</b>
+            <span>{{ l['body']|replace('\n', ' ')|truncate(70, False, '…') }}</span>
           </a>
         </div>
       {% else %}
