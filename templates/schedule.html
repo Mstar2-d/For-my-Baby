@@ -73,6 +73,30 @@
     </form>
   </nav>
 
+  {% if together['banner'] %}
+    <div class="banner {{ together['banner']['kind'] }}" role="status">
+      <span class="banner-icon" aria-hidden="true">🎉</span>
+      <div class="banner-text">
+        <b>{{ together['banner']['text'] }}</b>
+        <small>{{ together['banner']['sub'] }}</small>
+      </div>
+      <span class="banner-icon" aria-hidden="true">🎉</span>
+    </div>
+  {% endif %}
+
+  <section class="panel counter" aria-label="Day counter">
+    {% if together['started'] %}
+      <p class="count-label">Days Together with you</p>
+      <p class="count-num">{{ together['days_text'] }}</p>
+      <p class="count-break">{{ together['breakdown'] }}</p>
+      <p class="count-next">{{ together['next_text'] }} · since {{ together['since'] }}</p>
+    {% else %}
+      <p class="count-label">Counting down</p>
+      <p class="count-num">{{ together['to_go_text'] }}</p>
+      <p class="count-next">until {{ together['since'] }}</p>
+    {% endif %}
+  </section>
+
   <nav class="tabs" aria-label="Whose schedule">
     {% for key, label in tabs %}
       <a href="{{ url_for('schedule_page', who=key) if key else url_for('schedule_page') }}" class="{{ 'on' if view == key }}">{{ label }}</a>
