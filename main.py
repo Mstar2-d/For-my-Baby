@@ -15,6 +15,7 @@ import movies
 import planner
 import schedule_pics
 import timetable
+import together
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "local-dev-key-change-me")
@@ -183,6 +184,7 @@ def schedule_page():
         "schedule.html",
         board=timetable.board(WHO_FILTERS.get(view)),
         pics=schedule_pics.list_pics(WHO_FILTERS.get(view)),
+        together=together.info(),
         view=view,
         tabs=[("", "Both"), ("maryan", MY_NAME), ("mariah", HER_NAME)],
         names=[MY_NAME, HER_NAME],

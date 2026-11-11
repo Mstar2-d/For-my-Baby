@@ -15,7 +15,10 @@
     12. Movie checklist
     13. Replies
     14. Print
-    15. Phones and touch screens (always last, so it wins)
+    15. Phones and touch screens
+    16. Schedule dashboard
+    17. Schedule pictures
+    18. Day counter and monthsary banner
    ========================================================================== */
 
 
@@ -357,7 +360,7 @@ textarea:focus-visible {
    5. TOP MENU AND ACTION BUTTONS
    ========================================================================== */
 
-/* The Gallery, Planner and Movies buttons under the title */
+/* The section buttons under the title */
 .nav {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1174,7 +1177,7 @@ textarea.reply-text:focus {
 
 /* ==========================================================================
    15. PHONES AND TOUCH SCREENS
-   This section is last on purpose: it overrides the rules above on small screens.
+   Overrides the rules above on small screens.
    ========================================================================== */
 
 /* Narrow screens (phones) */
@@ -1337,9 +1340,10 @@ textarea.reply-text:focus {
     padding: 10px 6px;
   }
 }
+
+
 /* ==========================================================================
    16. SCHEDULE DASHBOARD
-   Pasted at the end on purpose, so it works together with the phones section above.
    ========================================================================== */
 
 /* Four section buttons fit in one row on computers (phones keep two per row) */
@@ -1653,6 +1657,7 @@ textarea.reply-text:focus {
   }
 }
 
+
 /* ==========================================================================
    17. SCHEDULE PICTURES
    ========================================================================== */
@@ -1751,6 +1756,122 @@ textarea.reply-text:focus {
 @media print {
   .pic-add,
   .pic form {
+    display: none;
+  }
+}
+
+
+/* ==========================================================================
+   18. DAY COUNTER AND MONTHSARY BANNER
+   ========================================================================== */
+
+/* The glowing banner on the 15th */
+.banner {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0 14px;
+  padding: 14px 16px;
+  text-align: center;
+  color: #fff;
+  background: linear-gradient(110deg, #c9304a, #e0559a, #9a63d6, #e0559a, #c9304a);
+  background-size: 250% 100%;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 18px;
+  box-shadow:
+    0 8px 32px rgba(158, 27, 50, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  animation:
+    banner-pop 0.6s cubic-bezier(0.2, 1.4, 0.4, 1),
+    banner-shine 6s linear infinite;
+}
+
+.banner.anniversary {
+  background: linear-gradient(110deg, #f5c451, #ff9ccf, #9a63d6, #ff9ccf, #f5c451);
+  background-size: 250% 100%;
+}
+
+.banner-text b {
+  display: block;
+  font-size: clamp(1.5rem, 6vw, 2.1rem);
+  font-style: italic;
+  font-weight: 600;
+  line-height: 1.15;
+  text-shadow: 0 2px 10px rgba(10, 6, 40, 0.5);
+}
+
+.banner-text small {
+  display: block;
+  margin-top: 2px;
+  font-size: 1rem;
+  opacity: 0.95;
+  text-shadow: 0 1px 6px rgba(10, 6, 40, 0.5);
+}
+
+.banner-icon {
+  font-size: 1.8rem;
+}
+
+@keyframes banner-pop {
+  from {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@keyframes banner-shine {
+  from { background-position: 0% 0; }
+  to   { background-position: 250% 0; }
+}
+
+/* The day counter card */
+.counter {
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+.count-label {
+  margin: 0;
+  font-size: 1.15rem;
+  font-style: italic;
+  opacity: 0.95;
+}
+
+.count-num {
+  margin: 0 0 4px;
+  font-size: clamp(3.2rem, 16vw, 5rem);
+  font-style: italic;
+  font-weight: 600;
+  line-height: 1.05;
+  text-shadow: 0 2px 16px rgba(10, 6, 40, 0.5);
+}
+
+.count-break {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.count-next {
+  margin: 6px 0 0;
+  font-size: 0.95rem;
+  opacity: 0.85;
+}
+
+/* No movement for people who turned animations off */
+@media (prefers-reduced-motion: reduce) {
+  .banner {
+    animation: none;
+  }
+}
+
+@media print {
+  .banner {
     display: none;
   }
 }
