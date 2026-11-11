@@ -9,50 +9,6 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-
-{# The time, room and subject of one class #}
-{% macro info(c, show_state) %}
-  <div class="when"><b>{{ c['start_label'] }}</b><span>{{ c['end_label'] }}</span></div>
-  <div class="what">
-    <span class="subject">{{ c['subject'] }}{% if show_state and c['status'] %}<span class="state {{ c['status'] }}">{{ c['status']|capitalize }}</span>{% endif %}</span>
-    <small><span class="chip {{ c['owner']|lower }}">{{ c['owner'] }}</span>{% if c['room'] %} · {{ c['room'] }}{% endif %}</small>
-    {% if c['notes'] %}<small>{{ c['notes'] }}</small>{% endif %}
-  </div>
-{% endmacro %}
-
-{# The boxes used to add a class or change one #}
-{% macro fields(c, names, day_names, day_default, owner_default) %}
-  <label>Who
-    <select name="owner">
-      {% for n in names %}
-        <option value="{{ n }}" {% if (c and c['owner'] == n) or (not c and n == owner_default) %}selected{% endif %}>{{ n }}</option>
-      {% endfor %}
-    </select>
-  </label>
-  <label>Day
-    <select name="day">
-      {% for d in day_names %}
-        <option value="{{ loop.index0 }}" {% if (c and c['weekday'] == loop.index0) or (not c and day_default == loop.index0) %}selected{% endif %}>{{ d }}</option>
-      {% endfor %}
-    </select>
-  </label>
-  <label>Starts
-    <input type="time" name="start" value="{{ c['start'] if c else '' }}" required>
-  </label>
-  <label>Ends
-    <input type="time" name="end" value="{{ c['end'] if c else '' }}" required>
-  </label>
-  <label class="wide">Subject
-    <input type="text" name="subject" value="{{ c['subject'] if c else '' }}" maxlength="80" placeholder="e.g. Math" autocomplete="off" required>
-  </label>
-  <label class="wide">Room
-    <input type="text" name="room" value="{{ c['room'] if c else '' }}" maxlength="40" placeholder="optional" autocomplete="off">
-  </label>
-  <label class="wide">Notes
-    <input type="text" name="notes" value="{{ c['notes'] if c else '' }}" maxlength="200" placeholder="optional, like the teacher or what to bring" autocomplete="off">
-  </label>
-{% endmacro %}
-
 <main>
   <p class="who">Signed in as {{ me }} · <a href="{{ url_for('logout') }}">Log out</a></p>
   <h1>Our Schedule</h1>
@@ -150,70 +106,10 @@
       </form>
     </details>
   </section>
-
-  <section class="panel" aria-label="Today">
-    <h2>Today</h2>
-    <p class="panel-sub">{{ board['today']['name'] }}, {{ board['today']['date'] }}</p>
-    {% if board['today']['classes'] %}
-      <ul class="slots">
-        {% for c in board['today']['classes'] %}
-          <li class="slot {{ c['owner']|lower }} {{ c['status'] }}">
-            {{ info(c, True) }}
-          </li>
-        {% endfor %}
-      </ul>
-    {% elif board['total'] == 0 %}
-      <p class="empty">No classes typed in yet. Add the first one below.</p>
-    {% else %}
-      <p class="empty">No classes today. Enjoy the day.</p>
-    {% endif %}
-  </section>
-
-  <details class="add-class panel">
-    <summary>＋ Add a class</summary>
-    <form class="sform" method="post" action="{{ url_for('schedule_add') }}">
-      <input type="hidden" name="view" value="{{ view }}">
-      {{ fields(None, names, day_names, board['today']['index'], me) }}
-      <div class="btns">
-        <button type="submit" class="primary">Add class</button>
-      </div>
-    </form>
-  </details>
-
-  <h2>The week</h2>
-  {% for d in board['days'] %}
-    <section class="dayblock{% if d['today'] %} today{% endif %}">
-      <h3>{{ d['name'] }}{% if d['today'] %}<span class="today-badge">Today</span>{% endif %}</h3>
-      {% if d['classes'] %}
-        <ul class="slots">
-          {% for c in d['classes'] %}
-            <li class="slot {{ c['owner']|lower }}">
-              {{ info(c, False) }}
-              <div class="slot-tools">
-                <details class="edit-class">
-                  <summary>Edit</summary>
-                  <form class="sform" method="post" action="{{ url_for('schedule_edit', class_id=c['id']) }}">
-                    <input type="hidden" name="view" value="{{ view }}">
-                    {{ fields(c, names, day_names, 0, me) }}
-                    <div class="btns">
-                      <button type="submit" class="primary">Save</button>
-                      <button type="submit" class="del" formaction="{{ url_for('schedule_delete', class_id=c['id']) }}" formnovalidate onclick="return confirm('Delete this class?')">Delete</button>
-                    </div>
-                  </form>
-                </details>
-              </div>
-            </li>
-          {% endfor %}
-        </ul>
-      {% else %}
-        <p class="empty">No classes</p>
-      {% endif %}
-    </section>
-  {% endfor %}
 </main>
 
 <script>
-  // Keeps your place on the page after saving or deleting
+  // Keeps your place on the page after posting or deleting a picture
   document.addEventListener('submit', function () {
     try { sessionStorage.setItem('scheduleY', String(window.scrollY)); } catch (e) {}
   });
