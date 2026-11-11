@@ -2058,3 +2058,86 @@ textarea.rev-text:focus {
     min-height: 40px;
   }
 }
+
+/* ==========================================================================
+   18. REVIEWS BUTTON (reviews stay hidden until you tap it)
+   ========================================================================== */
+
+.rv-toggle {
+  margin-top: 12px;
+}
+
+/* The "Reviews" button */
+.rv-toggle > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 6px 16px;
+  list-style: none;
+  cursor: pointer;
+  font: 700 0.9rem var(--sans);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--glass-edge);
+  border-radius: 999px;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+
+.rv-toggle > summary::-webkit-details-marker {
+  display: none;
+}
+
+.rv-toggle > summary:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: var(--glass-edge-hi);
+}
+
+/* The number of reviews */
+.rv-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: var(--accent-grad);
+  border-radius: 999px;
+}
+
+/* A small arrow that flips when the reviews are open */
+.rv-toggle > summary::after {
+  content: "▾";
+  font-size: 0.85rem;
+  opacity: 0.85;
+  transition: transform 0.2s ease;
+}
+
+.rv-toggle[open] > summary::after {
+  transform: rotate(180deg);
+}
+
+.rv-toggle[open] > summary {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: var(--glass-edge-hi);
+}
+
+/* What's inside once it's open */
+.rv-body {
+  margin-top: 4px;
+}
+
+.rv-body .empty {
+  margin: 12px 0 0;
+}
+
+.rv-body .rvlist {
+  margin-top: 12px;
+}
+
+@media (max-width: 700px) {
+  .rv-toggle > summary {
+    width: 100%;
+    justify-content: center;
+  }
+}

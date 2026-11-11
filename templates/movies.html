@@ -66,7 +66,7 @@
           <div class="film-main">
             <span class="film-title">{{ m['title'] }}</span>
             <small class="film-avg">
-              {% if m['count'] %}{{ stars(m['avg_round']) }} {{ m['avg_text'] }} · {{ m['count'] }} {{ 'review' if m['count'] == 1 else 'reviews' }}{% else %}No reviews yet{% endif %}
+              {% if m['count'] %}{{ stars(m['avg_round']) }} {{ m['avg_text'] }}{% else %}No reviews yet{% endif %}
               · added by {{ m['by'] }}
             </small>
           </div>
@@ -75,40 +75,48 @@
           </form>
         </div>
 
-        {% if m['reviews'] %}
-          <ul class="rvlist">
-            {% for r in m['reviews'] %}
-              <li class="rv">
-                {{ stars(r['rating']) }}
-                {% if r['comment'] %}<p class="rv-comment">{{ r['comment'] }}</p>{% endif %}
-                <div class="rv-meta">
-                  <span><span class="chip {{ r['author']|lower }}">{{ r['author'] }}</span>{% if r['date'] %} · {{ r['date'] }}{% endif %}</span>
-                  {% if r['author'] == me %}
-                    <form class="inline" method="post" action="{{ url_for('movie_review_delete', review_id=r['id']) }}" onsubmit="return confirm('Delete your review?')">
-                      <button type="submit" class="x" aria-label="Delete review">Delete</button>
-                    </form>
-                  {% endif %}
-                </div>
-              </li>
-            {% endfor %}
-          </ul>
-        {% endif %}
+        <details class="rv-toggle" id="rv-{{ m['id'] }}">
+          <summary>Reviews <span class="rv-count">{{ m['count'] }}</span></summary>
 
-        <details class="rev-add">
-          <summary>＋ {{ 'Add another review' if m['reviews'] else 'Add a review' }}</summary>
-          <form class="rev-form" method="post" action="{{ url_for('movie_review', movie_id=m['id']) }}">
-            <p class="rev-as">Reviewing as {{ me }}</p>
-            <div class="rate" role="radiogroup" aria-label="Your rating">
-              {% for i in [5, 4, 3, 2, 1] %}
-                <input type="radio" name="rating" id="r{{ m['id'] }}-{{ i }}" value="{{ i }}">
-                <label for="r{{ m['id'] }}-{{ i }}"><span class="sr">{{ i }} star{{ 's' if i > 1 }}</span>★</label>
-              {% endfor %}
-            </div>
-            <textarea class="rev-text" name="comment" maxlength="600" placeholder="What did you think? (optional)" aria-label="Your review"></textarea>
-            <div class="btns">
-              <button type="submit" class="primary">Save review</button>
-            </div>
-          </form>
+          <div class="rv-body">
+            {% if m['reviews'] %}
+              <ul class="rvlist">
+                {% for r in m['reviews'] %}
+                  <li class="rv">
+                    {{ stars(r['rating']) }}
+                    {% if r['comment'] %}<p class="rv-comment">{{ r['comment'] }}</p>{% endif %}
+                    <div class="rv-meta">
+                      <span><span class="chip {{ r['author']|lower }}">{{ r['author'] }}</span>{% if r['date'] %} · {{ r['date'] }}{% endif %}</span>
+                      {% if r['author'] == me %}
+                        <form class="inline" method="post" action="{{ url_for('movie_review_delete', review_id=r['id']) }}" onsubmit="return confirm('Delete your review?')">
+                          <button type="submit" class="x" aria-label="Delete review">Delete</button>
+                        </form>
+                      {% endif %}
+                    </div>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <p class="empty">No reviews yet. Be the first.</p>
+            {% endif %}
+
+            <details class="rev-add">
+              <summary>＋ {{ 'Add another review' if m['reviews'] else 'Add a review' }}</summary>
+              <form class="rev-form" method="post" action="{{ url_for('movie_review', movie_id=m['id']) }}">
+                <p class="rev-as">Reviewing as {{ me }}</p>
+                <div class="rate" role="radiogroup" aria-label="Your rating">
+                  {% for i in [5, 4, 3, 2, 1] %}
+                    <input type="radio" name="rating" id="r{{ m['id'] }}-{{ i }}" value="{{ i }}">
+                    <label for="r{{ m['id'] }}-{{ i }}"><span class="sr">{{ i }} star{{ 's' if i > 1 }}</span>★</label>
+                  {% endfor %}
+                </div>
+                <textarea class="rev-text" name="comment" maxlength="600" placeholder="What did you think? (optional)" aria-label="Your review"></textarea>
+                <div class="btns">
+                  <button type="submit" class="primary">Save review</button>
+                </div>
+              </form>
+            </details>
+          </div>
         </details>
       </section>
     {% endfor %}
@@ -116,11 +124,24 @@
 </main>
 
 <script>
-  // Keeps your place on the page after ticking, saving or deleting
+  // After ticking, saving or deleting, the page reloads. This keeps your place
+  // and re-opens the Reviews you had open, so a new review shows straight away.
   document.addEventListener('submit', function () {
-    try { sessionStorage.setItem('moviesY', String(window.scrollY)); } catch (e) {}
+    try {
+      sessionStorage.setItem('moviesY', String(window.scrollY));
+      var open = [];
+      document.querySelectorAll('details.rv-toggle[open]').forEach(function (d) { open.push(d.id); });
+      sessionStorage.setItem('moviesOpen', JSON.stringify(open));
+    } catch (e) {}
   });
   try {
+    var open = JSON.parse(sessionStorage.getItem('moviesOpen') || '[]');
+    open.forEach(function (id) {
+      var d = document.getElementById(id);
+      if (d) d.open = true;
+    });
+    sessionStorage.removeItem('moviesOpen');
+
     var y = sessionStorage.getItem('moviesY');
     if (y !== null) {
       window.scrollTo(0, Number(y));
