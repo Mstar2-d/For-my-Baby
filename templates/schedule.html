@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Our Schedule</title>
+<title>Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Cormorant+Garamond:ital,wght@0,500;1,500;1,600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
@@ -11,8 +11,8 @@
 <body>
 <main>
   <p class="who">Signed in as {{ me }} · <a href="{{ url_for('logout') }}">Log out</a></p>
-  <h1>Our Schedule</h1>
-  <p class="sub">School days, side by side.</p>
+  <h1>Dashboard</h1>
+  <p class="sub">The Main.</p>
 
   <nav class="nav" aria-label="Sections">
     <form method="get" action="{{ url_for('letters_home') }}">
