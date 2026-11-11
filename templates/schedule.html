@@ -9,24 +9,36 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-<main>
+<main class="wide">
   <p class="who">Signed in as {{ me }} · <a href="{{ url_for('logout') }}">Log out</a></p>
-  <h1>Dashboard</h1>
-  <p class="sub">The Main.</p>
 
-  <nav class="nav" aria-label="Sections">
-    <form method="get" action="{{ url_for('letters_home') }}">
-      <button type="submit" class="primary">✉️ Letters</button>
-    </form>
-    <form method="get" action="{{ url_for('gallery') }}">
-      <button type="submit" class="primary">📷 Gallery</button>
-    </form>
-    <form method="get" action="{{ url_for('planner_page') }}">
-      <button type="submit" class="primary">📋 Planner</button>
-    </form>
-    <form method="get" action="{{ url_for('movies_page') }}">
-      <button type="submit" class="primary">🎬 Movies</button>
-    </form>
+  <header class="hello">
+    <p class="eyebrow">{{ together['today_label'] }}</p>
+    <h1>Dashboard</h1>
+    <p class="sub" id="greet">Hello, {{ me }}. Here’s everything for the two of you.</p>
+  </header>
+
+  <nav class="tiles" aria-label="Sections">
+    <a class="tile" href="{{ url_for('letters_home') }}">
+      <span class="tile-ico" aria-hidden="true">✉️</span>
+      <b>Letters</b>
+      <small>{{ 'Write to her' if me == names[0] else 'Read and reply' }}</small>
+    </a>
+    <a class="tile" href="{{ url_for('gallery') }}">
+      <span class="tile-ico" aria-hidden="true">📷</span>
+      <b>Gallery</b>
+      <small>Our photos</small>
+    </a>
+    <a class="tile" href="{{ url_for('planner_page') }}">
+      <span class="tile-ico" aria-hidden="true">📋</span>
+      <b>Planner</b>
+      <small>Plans and to-dos</small>
+    </a>
+    <a class="tile" href="{{ url_for('movies_page') }}">
+      <span class="tile-ico" aria-hidden="true">🎬</span>
+      <b>Movies</b>
+      <small>Watch together</small>
+    </a>
   </nav>
 
   {% if together['banner'] %}
@@ -40,75 +52,95 @@
     </div>
   {% endif %}
 
-  <section class="panel counter" aria-label="Day counter">
-    {% if together['started'] %}
-      <p class="count-label">Days Together with you</p>
-      <p class="count-num">{{ together['days_text'] }}</p>
-      <p class="count-break">{{ together['breakdown'] }}</p>
-      <p class="count-next">{{ together['next_text'] }} · since {{ together['since'] }}</p>
-    {% else %}
-      <p class="count-label">Counting down</p>
-      <p class="count-num">{{ together['to_go_text'] }}</p>
-      <p class="count-next">until {{ together['since'] }}</p>
-    {% endif %}
-  </section>
-
-  <nav class="tabs" aria-label="Whose schedule">
-    {% for key, label in tabs %}
-      <a href="{{ url_for('schedule_page', who=key) if key else url_for('schedule_page') }}" class="{{ 'on' if view == key }}">{{ label }}</a>
-    {% endfor %}
-  </nav>
-
   {% with messages = get_flashed_messages() %}
     {% for m in messages %}
       <p class="note" role="status">{{ m }}</p>
     {% endfor %}
   {% endwith %}
 
-  <section class="panel pics" aria-label="Schedule pictures">
-    <h2>Schedule pictures</h2>
-    <p class="panel-sub">Post a photo or screenshot of your schedule. Tap one to open it full size.</p>
+  <div class="dash">
 
-    {% if pics %}
-      <div class="picgrid">
-        {% for p in pics %}
-          <figure class="pic">
-            <a href="{{ url_for('schedule_pic_view', pic_id=p['id']) }}" target="_blank" rel="noopener" aria-label="Open {{ p['owner'] }}’s schedule picture full size">
-              <img src="{{ url_for('schedule_pic_view', pic_id=p['id']) }}" alt="{{ p['owner'] }}’s schedule" loading="lazy">
-            </a>
-            <figcaption>
-              <span><span class="chip {{ p['owner']|lower }}">{{ p['owner'] }}</span>{% if p['label'] %} {{ p['label'] }}{% endif %}{% if p['date'] %} · {{ p['date'] }}{% endif %}</span>
-              <form class="inline" method="post" action="{{ url_for('schedule_pic_delete', pic_id=p['id']) }}" onsubmit="return confirm('Delete this picture?')">
-                <input type="hidden" name="view" value="{{ view }}">
-                <button type="submit" class="del" aria-label="Delete picture">Delete</button>
-              </form>
-            </figcaption>
-          </figure>
-        {% endfor %}
-      </div>
-    {% else %}
-      <p class="empty">No pictures yet. Post the first one below.</p>
-    {% endif %}
-
-    <details class="edit-class pic-add">
-      <summary>＋ Post a picture</summary>
-      <form class="sform" method="post" action="{{ url_for('schedule_pic_upload') }}" enctype="multipart/form-data" id="picForm">
-        <input type="hidden" name="view" value="{{ view }}">
-        <label class="wide">Picture (JPG, PNG or WebP, up to 10 MB)
-          <input type="file" name="pics" accept="image/jpeg,image/png,image/webp" multiple required>
-        </label>
-        <label class="wide">Label
-          <input type="text" name="label" maxlength="60" placeholder="optional, like Week of Nov 3" autocomplete="off">
-        </label>
-        <div class="btns">
-          <button type="submit" class="primary" id="picBtn">Post</button>
+    <section class="panel hero counter" aria-label="Day counter">
+      {% if together['started'] %}
+        <p class="count-label">Days Together with you</p>
+        <div class="ring" style="--p: {{ together['progress'] }}">
+          <div class="ring-in">
+            <span class="count-num">{{ together['days_text'] }}</span>
+            <span class="count-unit">{{ together['unit'] }}</span>
+          </div>
         </div>
-      </form>
-    </details>
-  </section>
+        <p class="count-break">{{ together['breakdown'] }}</p>
+        <p class="count-next">{{ together['next_text'] }}<br>since {{ together['since'] }}</p>
+      {% else %}
+        <p class="count-label">Counting down</p>
+        <p class="count-num">{{ together['to_go_text'] }}</p>
+        <p class="count-next">until {{ together['since'] }}</p>
+      {% endif %}
+    </section>
+
+    <section class="panel pics" aria-label="Schedule pictures">
+      <div class="panel-head">
+        <div>
+          <h2>Schedule pictures</h2>
+          <p class="panel-sub">Tap a picture to open it full size.</p>
+        </div>
+        <nav class="tabs" aria-label="Whose schedule">
+          {% for key, label in tabs %}
+            <a href="{{ url_for('schedule_page', who=key) if key else url_for('schedule_page') }}" class="{{ 'on' if view == key }}">{{ label }}</a>
+          {% endfor %}
+        </nav>
+      </div>
+
+      {% if pics %}
+        <div class="picgrid">
+          {% for p in pics %}
+            <figure class="pic">
+              <a href="{{ url_for('schedule_pic_view', pic_id=p['id']) }}" target="_blank" rel="noopener" aria-label="Open {{ p['owner'] }}’s schedule picture full size">
+                <img src="{{ url_for('schedule_pic_view', pic_id=p['id']) }}" alt="{{ p['owner'] }}’s schedule" loading="lazy">
+              </a>
+              <figcaption>
+                <span><span class="chip {{ p['owner']|lower }}">{{ p['owner'] }}</span>{% if p['label'] %} {{ p['label'] }}{% endif %}{% if p['date'] %} · {{ p['date'] }}{% endif %}</span>
+                <form class="inline" method="post" action="{{ url_for('schedule_pic_delete', pic_id=p['id']) }}" onsubmit="return confirm('Delete this picture?')">
+                  <input type="hidden" name="view" value="{{ view }}">
+                  <button type="submit" class="del" aria-label="Delete picture">Delete</button>
+                </form>
+              </figcaption>
+            </figure>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="empty">No pictures yet. Post the first one below.</p>
+      {% endif %}
+
+      <details class="edit-class pic-add">
+        <summary>＋ Post a picture</summary>
+        <form class="sform" method="post" action="{{ url_for('schedule_pic_upload') }}" enctype="multipart/form-data" id="picForm">
+          <input type="hidden" name="view" value="{{ view }}">
+          <label class="wide">Picture (JPG, PNG or WebP, up to 10 MB)
+            <input type="file" name="pics" accept="image/jpeg,image/png,image/webp" multiple required>
+          </label>
+          <label class="wide">Label
+            <input type="text" name="label" maxlength="60" placeholder="optional, like Week of Nov 3" autocomplete="off">
+          </label>
+          <div class="btns">
+            <button type="submit" class="primary" id="picBtn">Post</button>
+          </div>
+        </form>
+      </details>
+    </section>
+
+  </div>
 </main>
 
 <script>
+  // Greets you by the time of day on your own device
+  (function () {
+    var h = new Date().getHours();
+    var part = h < 5 ? 'Good evening' : h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+    var el = document.getElementById('greet');
+    if (el) el.textContent = part + ', ' + {{ me|tojson }} + '. Here’s everything for the two of you.';
+  })();
+
   // Keeps your place on the page after posting or deleting a picture
   document.addEventListener('submit', function () {
     try { sessionStorage.setItem('scheduleY', String(window.scrollY)); } catch (e) {}

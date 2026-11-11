@@ -59,6 +59,7 @@ def _in_days(n):
 def info():
     """Everything the dashboard needs to show the counter and the banner."""
     today = planner.today()
+    today_label = f"{today.strftime('%A, %b')} {today.day}"
     since = f"{START_DATE.strftime('%b')} {START_DATE.day}, {START_DATE.year}"
 
     # Before the start date: count down instead
@@ -66,6 +67,7 @@ def info():
         to_go = (START_DATE - today).days
         return {
             "started": False,
+            "today_label": today_label,
             "since": since,
             "to_go_text": _plural(to_go, "day"),
             "banner": None,
@@ -97,13 +99,21 @@ def info():
     next_in = (next_date - today).days
     next_name = "anniversary" if (months + 1) % 12 == 0 else "monthsary"
 
+    # How far through the current month you are (fills the ring on the dashboard)
+    period = leftover + next_in
+    progress = round(leftover * 100 / period) if period else 0
+    if banner:
+        progress = 100
+
     return {
         "started": True,
+        "today_label": today_label,
         "since": since,
         "days": days,
         "days_text": f"{days:,}",
         "unit": "day" if days == 1 else "days",
         "breakdown": f"{_plural(months, 'month')} · {_plural(leftover, 'day')}",
         "next_text": f"Next {next_name} {_in_days(next_in)}",
+        "progress": progress,
         "banner": banner,
     }

@@ -1,61 +1,83 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap");
+
 /* ==========================================================================
    DEAR YOU: love letters
    Sections:
-     1. Colors and page basics
-     2. Layout and headings
-     3. The glass panel (writing area)
-     4. Buttons
-     5. Top menu and action buttons
-     6. Saved letters list
-     7. Wax seal animation
-     8. Login page
-     9. Reader page
-    10. Gallery
-    11. Planner
-    12. Movie checklist
-    13. Replies
-    14. Print
-    15. Phones and touch screens
-    16. Schedule dashboard
-    17. Schedule pictures
-    18. Day counter and monthsary banner
+     1. Colors and design settings
+     2. Page and background
+     3. Text and layout
+     4. Glass surfaces
+     5. Buttons and fields
+     6. Navigation (pill bar, tiles, tabs)
+     7. Dashboard
+     8. Letter paper
+     9. Letters list and replies
+    10. Wax seal
+    11. Login
+    12. Gallery
+    13. Planner and movies
+    14. Motion
+    15. Print
+    16. Phones and touch screens (last, so it wins)
    ========================================================================== */
 
 
 /* ==========================================================================
-   1. COLORS AND PAGE BASICS
-   Change the colors here and the whole site updates.
+   1. COLORS AND DESIGN SETTINGS
+   Change a color here and the whole site follows.
    ========================================================================== */
 
 :root {
-  /* Page background: Soft Periwinkle, with your photo strips on top */
-  --bg-blue:   #4a5bd0;
-  --bg-purple: #9a63d6;
-  --bg-glow:   rgba(255, 255, 255, 0.25);
+  /* Background: deep indigo into violet */
+  --bg-a: #343a9a;
+  --bg-b: #7a4fc4;
 
   /* Text */
-  --text:   #ffffff;
-  --ink:    #ffffff;                    /* handwriting color on the glass */
-  --line:   rgba(255, 255, 255, 0.28);  /* ruled lines */
-  --muted:  rgba(255, 255, 255, 0.78);  /* soft labels like "My dearest" */
+  --text:  #ffffff;
+  --ink:   #ffffff;                    /* handwriting color on the glass */
+  --muted: rgba(255, 255, 255, 0.72);  /* softer text */
+  --line:  rgba(255, 255, 255, 0.22);  /* ruled lines */
 
-  /* Glass: a see-through tint, a blur, and a thin bright edge */
+  /* Frosted glass */
   --glass-bg:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.06)),
-    rgba(34, 22, 96, 0.38);
-  --glass-blur: blur(16px) saturate(150%);
-  --glass-edge: rgba(255, 255, 255, 0.35);
+    linear-gradient(150deg, rgba(255, 255, 255, 0.17), rgba(255, 255, 255, 0.04)),
+    rgba(30, 22, 92, 0.48);
+  --glass-blur: blur(18px) saturate(150%);
+  --glass-edge: rgba(255, 255, 255, 0.24);
+  --glass-edge-hi: rgba(255, 255, 255, 0.42);
   --glass-shadow:
-    0 8px 32px rgba(10, 6, 40, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    0 20px 50px -22px rgba(10, 6, 44, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  --field: rgba(255, 255, 255, 0.1);
 
-  /* Accents */
-  --seal:       #9e1b32;   /* wax seal and main button */
-  --seal-light: #c9304a;   /* hover and focus color */
-  --error:      #ffb3bf;   /* messages that need attention */
+  /* Accent: rose */
+  --accent: #e4568a;
+  --accent-grad: linear-gradient(135deg, #ec5f8d, #b447a8);
+  --accent-glow: rgba(236, 95, 141, 0.55);
+
+  /* Wax seal */
+  --seal: #9e1b32;
+  --seal-light: #c9304a;
+
+  --error: #ffc2cd;
+
+  /* Shapes */
+  --r-lg: 22px;
+  --r-md: 16px;
+  --r-sm: 12px;
+
+  /* Fonts */
+  --serif: "Cormorant Garamond", Georgia, serif;
+  --sans: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --hand: Caveat, cursive, sans-serif;
 
   color-scheme: dark;
 }
+
+
+/* ==========================================================================
+   2. PAGE AND BACKGROUND
+   ========================================================================== */
 
 /* Keeps content clear of phone notches, rounded corners and system bars */
 html {
@@ -66,7 +88,7 @@ html {
     env(safe-area-inset-bottom, 0px)
     env(safe-area-inset-left, 0px);
   scroll-padding-top: env(safe-area-inset-top, 0px);
-  -webkit-text-size-adjust: 100%;   /* stops phones from resizing text on their own */
+  -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
 }
@@ -80,129 +102,744 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
-  background-color: var(--bg-blue);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.5;
   color: var(--text);
-  font-family: "Cormorant Garamond", Georgia, serif;
-  font-size: 18px;
+  background-color: var(--bg-a);
 }
 
-/* The background: your two photo strips on top of a blue-to-purple blend.
-   It stays fixed, so the photos don't move while you scroll. */
+/* Soft colour glows over a deep indigo-to-violet blend (fixed while you scroll) */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(900px 520px at 12% -8%, rgba(255, 160, 205, 0.3), transparent 60%),
+    radial-gradient(900px 600px at 95% 8%, rgba(130, 170, 255, 0.32), transparent 60%),
+    radial-gradient(800px 700px at 50% 115%, rgba(190, 120, 255, 0.35), transparent 60%),
+    linear-gradient(160deg, var(--bg-a), var(--bg-b));
+}
+
+/* Your two photo strips at the sides, slightly toned down */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
   z-index: -1;
-  background-image:
-    url("bg1.jpg"),
-    url("bg2.jpg"),
-    radial-gradient(1000px 600px at 50% -10%, var(--bg-glow), transparent),
-    linear-gradient(135deg, var(--bg-blue), var(--bg-purple));
+  pointer-events: none;
+  background-image: url("bg1.jpg"), url("bg2.jpg");
   background-repeat: no-repeat;
-  background-size: auto 100vh, auto 100vh, auto, auto;
-  /* Phones: use the real visible height, even when the address bar moves */
-  background-size: auto 100dvh, auto 100dvh, auto, auto;
-  background-position: left 3vw center, right 3vw center, center, center;
+  background-size: auto 100vh, auto 100vh;
+  background-size: auto 100dvh, auto 100dvh;
+  background-position: left 3vw center, right 3vw center;
+  opacity: 0.9;
+  filter: saturate(0.82) brightness(0.94);
 }
 
 img {
   max-width: 100%;
 }
 
-/* Text that sits straight on the photos gets a soft shadow so it stays readable */
-h1,
-h2,
-.sub,
-.who {
-  text-shadow: 0 2px 14px rgba(10, 6, 40, 0.7);
-}
-
 
 /* ==========================================================================
-   2. LAYOUT AND HEADINGS
+   3. TEXT AND LAYOUT
    ========================================================================== */
 
 main {
-  max-width: 760px;
+  max-width: 780px;
   margin: 0 auto;
-  padding: 28px 18px 64px;
+  padding: 26px 20px 72px;
+}
+
+main.wide {
+  max-width: 1000px;
 }
 
 h1 {
-  margin: 8px 0 4px;
+  margin: 8px 0 6px;
   text-align: center;
-  font-size: clamp(2.2rem, 7vw, 3.4rem);
-  font-style: italic;
-  font-weight: 600;
+  font: italic 600 clamp(2.4rem, 7vw, 3.6rem) / 1.05 var(--serif);
   letter-spacing: 0.01em;
+  text-shadow: 0 2px 18px rgba(10, 6, 44, 0.55);
 }
 
 h2 {
-  margin: 44px 0 12px;
-  font-size: 1.7rem;
-  font-style: italic;
-  font-weight: 600;
+  margin: 40px 0 12px;
+  font: italic 600 1.7rem / 1.2 var(--serif);
+  text-shadow: 0 2px 14px rgba(10, 6, 44, 0.5);
 }
 
-/* The line under the main title */
+h3 {
+  margin: 0 0 8px;
+  font: italic 600 1.35rem / 1.2 var(--serif);
+}
+
+/* The line under a title */
 .sub {
-  margin: 0 0 26px;
+  margin: 0 0 24px;
   text-align: center;
-  font-style: italic;
-  opacity: 0.9;
+  font-size: 0.98rem;
+  color: var(--muted);
 }
 
-/* "Writing as Maryan · Log out" at the top right */
+/* Small label above a title, like the date */
+.eyebrow {
+  margin: 0;
+  font: 700 0.72rem / 1.2 var(--sans);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* "Signed in as Maryan · Log out" */
 .who {
   margin: 0;
   text-align: right;
-  font-size: 1rem;
+  font: 600 0.85rem / 1.4 var(--sans);
+  letter-spacing: 0.02em;
 }
 
 .who a {
   display: inline-block;
-  padding: 6px 4px;
+  padding: 6px 2px;
   color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
 }
 
-/* Small message under the panel, like "Write a few words before sealing" */
+.who a:hover {
+  border-bottom-color: #fff;
+}
+
+/* Small message under a panel, like "Write a few words before sealing" */
 .msg {
-  margin: 8px 0 0;
-  font-family: Caveat, cursive, sans-serif;
+  margin: 10px 0 0;
+  font-family: var(--hand);
   font-size: 1.3rem;
   color: var(--error);
 }
 
 .empty {
-  font-style: italic;
-  opacity: 0.85;
+  margin: 8px 0;
+  font: italic 500 1.1rem / 1.4 var(--serif);
+  color: var(--muted);
 }
 
 
 /* ==========================================================================
-   3. THE GLASS PANEL (WRITING AREA)
+   4. GLASS SURFACES
+   Every card on the site shares this frosted-glass look.
    ========================================================================== */
 
-/* The frosted glass sheet the letter is written on */
-.paper {
-  position: relative;
-  padding: 28px 26px 30px;
-  color: var(--ink);
+.paper,
+.panel,
+.item,
+.reply,
+.task,
+.photo,
+.upload,
+.add,
+.login,
+.note,
+.tile {
   background: var(--glass-bg);
   -webkit-backdrop-filter: var(--glass-blur);
   backdrop-filter: var(--glass-blur);
   border: 1px solid var(--glass-edge);
-  border-radius: 18px;
+  border-radius: var(--r-lg);
   box-shadow: var(--glass-shadow);
 }
 
-/* "My dearest Mariah" line */
+.panel {
+  padding: 22px;
+}
+
+.panel > h2 {
+  margin: 0 0 2px;
+}
+
+.panel-sub {
+  margin: 2px 0 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+/* Heading on the left, switch on the right */
+.panel-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.panel-head h2 {
+  margin: 0;
+}
+
+/* Messages like "3 photos added." */
+.note {
+  max-width: 560px;
+  margin: 0 auto 14px;
+  padding: 11px 16px;
+  text-align: center;
+  font-size: 0.92rem;
+  border-left: 4px solid var(--accent);
+  border-radius: var(--r-sm);
+}
+
+
+/* ==========================================================================
+   5. BUTTONS AND FIELDS
+   ========================================================================== */
+
+/* Row of buttons under a panel */
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin: 22px 0 8px;
+}
+
+/* Glass buttons */
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 18px;
+  font: 600 0.92rem / 1.2 var(--sans);
+  letter-spacing: 0.01em;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--glass-edge);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+button:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: var(--glass-edge-hi);
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0) scale(0.98);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+  transform: none;
+}
+
+/* Main action: "Seal and keep", "Log in", "Post", "Add" */
+button.primary {
+  font-weight: 700;
+  background: var(--accent-grad);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 10px 24px -10px var(--accent-glow);
+}
+
+button.primary:hover {
+  background: var(--accent-grad);
+  filter: brightness(1.1);
+}
+
+/* Delete buttons */
+button.del,
+button.x,
+.item button {
+  color: var(--error);
+  background: rgba(255, 120, 150, 0.08);
+  border-color: rgba(255, 194, 205, 0.45);
+}
+
+button.del:hover,
+button.x:hover,
+.item button:hover {
+  background: rgba(255, 120, 150, 0.2);
+}
+
+.inline {
+  display: inline;
+  margin: 0;
+}
+
+/* Visible outline when using the keyboard */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* Text boxes everywhere (the letter's own name boxes override this below) */
+input[type="text"],
+input[type="date"],
+input[type="time"],
+input[type="password"],
+input[type="file"],
+select {
+  min-width: 0;
+  padding: 11px 14px;
+  font: 500 1rem / 1.3 var(--sans);
+  color: var(--text);
+  background: var(--field);
+  border: 1px solid var(--glass-edge);
+  border-radius: 14px;
+}
+
+input::placeholder {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+input[type="file"]::file-selector-button {
+  margin-right: 12px;
+  padding: 7px 16px;
+  font: 600 0.88rem var(--sans);
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid var(--glass-edge);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+
+/* ==========================================================================
+   6. NAVIGATION
+   ========================================================================== */
+
+/* Pill bar on the letters pages: Dashboard, Gallery, Planner, Movies */
+.nav {
+  display: flex;
+  gap: 4px;
+  max-width: 560px;
+  margin: 14px auto 24px;
+  padding: 5px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-edge);
+  border-radius: 999px;
+  box-shadow: var(--glass-shadow);
+}
+
+.nav::-webkit-scrollbar {
+  display: none;
+}
+
+.nav form {
+  display: block;
+  flex: 1 1 auto;
+  margin: 0;
+}
+
+.nav button,
+.nav button.primary {
+  width: 100%;
+  padding: 9px 14px;
+  font-size: 0.88rem;
+  white-space: nowrap;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  filter: none;
+}
+
+.nav button:hover {
+  background: rgba(255, 255, 255, 0.16);
+  transform: none;
+}
+
+/* Large section tiles on the dashboard */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0 0 20px;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 18px;
+  color: inherit;
+  text-decoration: none;
+  border-radius: var(--r-md);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.tile:hover {
+  transform: translateY(-3px);
+  border-color: var(--glass-edge-hi);
+}
+
+.tile-ico {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 12px;
+  font-size: 1.35rem;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid var(--glass-edge);
+  border-radius: 14px;
+}
+
+.tile:nth-child(1) .tile-ico { background: linear-gradient(135deg, rgba(255, 140, 180, 0.5), rgba(255, 255, 255, 0.08)); }
+.tile:nth-child(2) .tile-ico { background: linear-gradient(135deg, rgba(120, 190, 255, 0.5), rgba(255, 255, 255, 0.08)); }
+.tile:nth-child(3) .tile-ico { background: linear-gradient(135deg, rgba(255, 205, 110, 0.5), rgba(255, 255, 255, 0.08)); }
+.tile:nth-child(4) .tile-ico { background: linear-gradient(135deg, rgba(190, 140, 255, 0.55), rgba(255, 255, 255, 0.08)); }
+
+.tile b {
+  font-size: 1.02rem;
+  font-weight: 700;
+}
+
+.tile small {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+/* Both / Maryan / Mariah switch */
+.tabs {
+  display: inline-flex;
+  gap: 2px;
+  padding: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-edge);
+  border-radius: 999px;
+}
+
+.tabs a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 4px 15px;
+  font: 600 0.85rem var(--sans);
+  color: var(--text);
+  text-decoration: none;
+  border-radius: 999px;
+  transition: background 0.18s ease;
+}
+
+.tabs a:not(.on):hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.tabs a.on {
+  background: var(--accent-grad);
+  box-shadow: 0 6px 16px -8px var(--accent-glow);
+}
+
+
+/* ==========================================================================
+   7. DASHBOARD
+   ========================================================================== */
+
+/* Greeting block, left-aligned */
+.hello {
+  margin: 10px 0 24px;
+}
+
+.hello h1 {
+  margin: 4px 0 6px;
+  text-align: left;
+}
+
+.hello .sub {
+  margin: 0;
+  text-align: left;
+}
+
+/* Counter on the left, pictures on the right */
+.dash {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px;
+}
+
+@media (min-width: 900px) {
+  .dash {
+    grid-template-columns: 330px minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .dash .hero {
+    position: sticky;
+    top: 18px;
+  }
+}
+
+.hero {
+  padding: 26px 22px;
+  text-align: center;
+}
+
+.count-label {
+  margin: 0;
+  font: italic 500 1.35rem / 1.2 var(--serif);
+}
+
+/* The progress ring: it fills as the next monthsary gets closer */
+.ring {
+  --p: 0;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(210px, 64vw);
+  aspect-ratio: 1;
+  margin: 18px auto 14px;
+}
+
+.ring::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(#ff9ccf, #ffffff calc(var(--p) * 1%), rgba(255, 255, 255, 0.16) 0);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 11px), #000 calc(100% - 10px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 11px), #000 calc(100% - 10px));
+  filter: drop-shadow(0 0 12px rgba(255, 156, 207, 0.55));
+}
+
+.ring-in {
+  position: relative;
+  display: grid;
+  justify-items: center;
+}
+
+.count-num {
+  display: block;
+  margin: 0;
+  font: italic 600 clamp(3.2rem, 12vw, 4.4rem) / 1 var(--serif);
+  text-shadow: 0 2px 16px rgba(10, 6, 44, 0.5);
+}
+
+.count-unit {
+  margin-top: 4px;
+  font: 700 0.7rem var(--sans);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.count-break {
+  margin: 0;
+  font-size: 0.98rem;
+  font-weight: 700;
+}
+
+.count-next {
+  margin: 6px 0 0;
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+
+/* The glowing banner on the 15th */
+.banner {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0 18px;
+  padding: 16px 18px;
+  text-align: center;
+  color: #fff;
+  background: linear-gradient(110deg, #d94a7f, #e0559a, #9a63d6, #e0559a, #d94a7f);
+  background-size: 250% 100%;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: var(--r-lg);
+  box-shadow: 0 18px 44px -16px rgba(236, 95, 141, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  animation: banner-pop 0.6s cubic-bezier(0.2, 1.4, 0.4, 1), banner-shine 6s linear infinite;
+}
+
+.banner.anniversary {
+  background: linear-gradient(110deg, #f5c451, #ff9ccf, #9a63d6, #ff9ccf, #f5c451);
+  background-size: 250% 100%;
+}
+
+.banner-text b {
+  display: block;
+  font: italic 600 clamp(1.5rem, 6vw, 2.1rem) / 1.15 var(--serif);
+  text-shadow: 0 2px 10px rgba(10, 6, 44, 0.5);
+}
+
+.banner-text small {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.95rem;
+  text-shadow: 0 1px 6px rgba(10, 6, 44, 0.5);
+}
+
+.banner-icon {
+  font-size: 1.8rem;
+}
+
+@keyframes banner-pop {
+  from { transform: scale(0.88); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+
+@keyframes banner-shine {
+  from { background-position: 0% 0; }
+  to   { background-position: 250% 0; }
+}
+
+/* Schedule pictures */
+.picgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 12px;
+}
+
+.pic {
+  margin: 0;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--r-md);
+}
+
+.pic a {
+  display: block;
+  overflow: hidden;
+  background: rgba(10, 6, 44, 0.3);
+  border-radius: var(--r-sm);
+}
+
+/* The whole picture shows, even tall ones */
+.pic img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 440px;
+  object-fit: contain;
+  transition: transform 0.4s ease;
+}
+
+.pic a:hover img {
+  transform: scale(1.03);
+}
+
+.pic figcaption {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 0.82rem;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+/* Little name tag: Maryan (blue), Mariah (pink) */
+.chip {
+  display: inline-block;
+  padding: 1px 10px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #1c1646;
+  background: #c9b8ff;
+  border-radius: 999px;
+}
+
+.chip.maryan { background: #8fc1ff; }
+.chip.mariah { background: #ff9ccf; }
+
+/* "＋ Post a picture" drop box */
+.edit-class > summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.edit-class > summary::-webkit-details-marker {
+  display: none;
+}
+
+.pic-add > summary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 50px;
+  margin-top: 16px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1.5px dashed var(--glass-edge-hi);
+  border-radius: 14px;
+  transition: background 0.18s ease;
+}
+
+.pic-add > summary:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* The form inside it */
+.sform {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.sform label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.sform .wide {
+  grid-column: 1 / -1;
+}
+
+.sform input,
+.sform select {
+  display: block;
+  width: 100%;
+  margin-top: 5px;
+}
+
+.sform .btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  grid-column: 1 / -1;
+}
+
+
+/* ==========================================================================
+   8. LETTER PAPER
+   ========================================================================== */
+
+.paper {
+  position: relative;
+  padding: 30px 30px 28px;
+  color: var(--ink);
+  border-radius: 24px;
+}
+
+/* "My dearest Mariah" */
 .row {
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
   align-items: baseline;
-  font-family: Caveat, cursive, sans-serif;
+  font-family: var(--hand);
   font-size: 1.7rem;
 }
 
@@ -210,45 +847,43 @@ h2 {
   color: var(--muted);
 }
 
-/* "Forever yours, Maryan" line */
+/* "Forever yours, Maryan" */
 .sig {
   display: flex;
   gap: 8px;
   align-items: baseline;
   margin-top: 14px;
-  font-family: Caveat, cursive, sans-serif;
+  font-family: var(--hand);
   font-size: 1.7rem;
 }
 
-/* Name boxes (they look like handwriting on a dashed line) */
-input[type="text"] {
+/* Name boxes look like handwriting on a dashed line */
+.paper input[type="text"] {
   flex: 1 1 140px;
-  min-width: 0;
   padding: 0 4px;
   font: inherit;
   color: var(--ink);
   background: transparent;
   border: 0;
   border-bottom: 1.5px dashed var(--line);
+  border-radius: 0;
 }
 
-input[type="text"]:focus,
-textarea:focus {
+.paper input[type="text"]:focus {
   outline: none;
-  border-bottom-color: var(--seal-light);
+  border-bottom-color: var(--accent);
 }
 
-/* Today's date, right-aligned */
 .date {
   margin: 10px 0 0;
   text-align: right;
-  font-family: Caveat, cursive, sans-serif;
+  font-family: var(--hand);
   font-size: 1.3rem;
   color: var(--muted);
 }
 
-/* The big writing box. The repeating gradient draws the ruled lines;
-   line-height must match the 42px spacing so text sits on the lines. */
+/* The big writing box; the gradient draws the ruled lines,
+   so line-height must stay equal to the 42px spacing. */
 textarea {
   display: block;
   width: 100%;
@@ -265,16 +900,20 @@ textarea {
   );
   background-attachment: local;
   color: var(--ink);
-  font-family: Caveat, cursive, sans-serif;
+  font-family: var(--hand);
   font-size: 1.65rem;
   line-height: 42px;
+}
+
+textarea:focus {
+  outline: none;
 }
 
 textarea::placeholder {
   color: rgba(255, 255, 255, 0.55);
 }
 
-/* Word count under the panel */
+/* Word count */
 .foot {
   display: flex;
   flex-wrap: wrap;
@@ -282,144 +921,69 @@ textarea::placeholder {
   align-items: center;
   justify-content: space-between;
   margin-top: 12px;
-  font-family: Caveat, cursive, sans-serif;
+  font-family: var(--hand);
   font-size: 1.3rem;
   color: var(--muted);
 }
 
-
-/* ==========================================================================
-   4. BUTTONS
-   ========================================================================== */
-
-/* Row of buttons under the panel */
-.bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-  margin: 22px 0 8px;
-}
-
-/* Glass buttons */
-button {
-  padding: 10px 18px;
-  font: inherit;
-  font-size: 1rem;
-  color: var(--text);
-  background: rgba(255, 255, 255, 0.14);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  border: 1px solid var(--glass-edge);
-  border-radius: 999px;
-  cursor: pointer;
-  transition: transform 0.15s, background 0.15s;
-}
-
-button:hover {
-  background: rgba(255, 255, 255, 0.26);
-}
-
-button:active {
-  transform: scale(0.97);
-}
-
-button:disabled {
-  opacity: 0.6;
-  cursor: wait;
-}
-
-/* Main action ("Seal and keep", "Log in", "Gallery", "Planner") */
-button.primary {
-  font-weight: 600;
-  color: #fff;
-  background: var(--seal);
-  border-color: var(--seal-light);
-}
-
-button.primary:hover {
-  background: var(--seal-light);
-}
-
-/* Visible outline when using the keyboard */
-button:focus-visible,
-input:focus-visible,
-textarea:focus-visible {
-  outline: 2px solid var(--seal-light);
-  outline-offset: 3px;
-}
-
-/* Lets the Delete form sit inside a list item without extra spacing */
-.inline {
-  display: inline;
-  margin: 0;
-}
-
-
-/* ==========================================================================
-   5. TOP MENU AND ACTION BUTTONS
-   ========================================================================== */
-
-/* The section buttons under the title */
-.nav {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  max-width: 560px;
-  margin: 0 auto 22px;
-}
-
-.nav form {
-  display: block;
-  margin: 0;
-}
-
-.nav button {
-  width: 100%;
-}
-
-/* "I need a spark", "Print" and "Seal and keep" under the letter.
-   On a computer they sit in a row; the phones section stacks them. */
 .actions {
   justify-content: center;
 }
 
+/* Read-only letter text on Mariah's page */
+.letter-view {
+  min-height: 200px;
+  margin-top: 6px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  background: repeating-linear-gradient(
+    transparent,
+    transparent 41px,
+    var(--line) 41px,
+    var(--line) 42px
+  );
+  background-attachment: local;
+  color: var(--ink);
+  font-family: var(--hand);
+  font-size: 1.65rem;
+  line-height: 42px;
+}
+
 
 /* ==========================================================================
-   6. SAVED LETTERS LIST
+   9. LETTERS LIST AND REPLIES
    ========================================================================== */
 
 .shelf {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);   /* stops long text from stretching the page */
+  grid-template-columns: minmax(0, 1fr);
   gap: 10px;
 }
 
-/* One saved letter, as a glass card */
 .item {
   display: flex;
-  gap: 12px;
+  gap: 14px;
   align-items: center;
-  padding: 12px 14px;
-  background: var(--glass-bg);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-edge);
-  border-radius: 14px;
-  box-shadow: var(--glass-shadow);
+  padding: 12px 16px;
+  border-radius: var(--r-md);
+  transition: transform 0.18s ease, border-color 0.18s ease;
 }
 
-/* Little red wax dot on the left */
+.item:hover {
+  transform: translateY(-2px);
+  border-color: var(--glass-edge-hi);
+}
+
+/* Little wax dot on the left */
 .item .dot {
   flex: none;
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background: radial-gradient(circle at 35% 30%, var(--seal-light), var(--seal));
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
-/* Title and preview text (clickable) */
 .item .t {
   flex: 1;
   min-width: 0;
@@ -429,26 +993,92 @@ textarea:focus-visible {
 
 .item .t b {
   display: block;
-  font-weight: 600;
+  font-size: 0.98rem;
+  font-weight: 700;
 }
 
 .item .t span {
   display: block;
   overflow: hidden;
-  font-size: 0.95rem;
+  font-size: 0.88rem;
   white-space: nowrap;
   text-overflow: ellipsis;
-  opacity: 0.8;
+  color: var(--muted);
 }
 
 .item button {
+  padding: 5px 13px;
+  font-size: 0.8rem;
+}
+
+/* The "💬 2" next to a letter's title */
+.badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 9px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid var(--glass-edge);
+  border-radius: 999px;
+}
+
+/* Replies */
+.replies {
+  margin-top: 8px;
+}
+
+.reply {
+  margin-bottom: 10px;
+  padding: 16px 18px;
+  border-radius: var(--r-md);
+}
+
+.reply p {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-family: var(--hand);
+  font-size: 1.5rem;
+  line-height: 1.35;
+}
+
+.reply .meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.reply .x {
   padding: 4px 12px;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
+}
+
+/* The box where Mariah types a reply (plain, no ruled lines) */
+textarea.reply-text {
+  min-height: 130px;
+  margin-top: 4px;
+  padding: 14px 16px;
+  font-size: 1.5rem;
+  line-height: 1.35;
+  background: var(--field);
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--r-md);
+}
+
+textarea.reply-text:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }
 
 
 /* ==========================================================================
-   7. WAX SEAL ANIMATION
+   10. WAX SEAL
    Shown for about 2 seconds after "Seal and keep", then fades away.
    ========================================================================== */
 
@@ -459,17 +1089,15 @@ textarea:focus-visible {
   display: none;
   place-items: center;
   background: rgba(14, 10, 46, 0.6);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
 }
 
-/* "auto" is added by the page right after a letter is saved */
 .seal.auto {
   display: grid;
   animation: seal-fade 0.4s 1.7s forwards;
 }
 
-/* The red wax circle with the heart */
 .seal div {
   display: grid;
   place-items: center;
@@ -479,67 +1107,50 @@ textarea:focus-visible {
   color: #f6c9d0;
   border-radius: 50%;
   background: radial-gradient(circle at 35% 30%, var(--seal-light), var(--seal) 70%);
-  box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.6),
-    inset 0 0 0 8px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 0 0 8px rgba(0, 0, 0, 0.12);
   animation: seal-stamp 0.6s cubic-bezier(0.2, 1.6, 0.4, 1);
 }
 
-/* "Sealed with love" text under the circle */
 .seal p {
   position: absolute;
   margin-top: 230px;
-  font-size: 1.4rem;
-  font-style: italic;
+  font: italic 500 1.5rem var(--serif);
 }
 
-/* The seal drops in and stamps down */
 @keyframes seal-stamp {
-  from {
-    transform: scale(2.4) rotate(-25deg);
-    opacity: 0;
-  }
-  to {
-    transform: none;
-    opacity: 1;
-  }
+  from { transform: scale(2.4) rotate(-25deg); opacity: 0; }
+  to   { transform: none; opacity: 1; }
 }
 
-/* The whole overlay fades out */
 @keyframes seal-fade {
-  to {
-    opacity: 0;
-    visibility: hidden;
-  }
-}
-
-/* No motion for people who turned animations off */
-@media (prefers-reduced-motion: reduce) {
-  .seal div {
-    animation: none;
-  }
+  to { opacity: 0; visibility: hidden; }
 }
 
 
 /* ==========================================================================
-   8. LOGIN PAGE
+   11. LOGIN
    ========================================================================== */
 
+/* Centers the login card on the screen */
+body:has(.login) main {
+  display: grid;
+  align-content: center;
+  min-height: calc(100dvh - 40px);
+}
+
 .login {
+  width: 100%;
   max-width: 420px;
-  margin: 4vh auto 0;
-  padding: 24px;
-  background: var(--glass-bg);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-edge);
-  border-radius: 18px;
-  box-shadow: var(--glass-shadow);
+  margin: 8px auto 0;
+  padding: 28px;
 }
 
 .plabel {
   display: block;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
 }
 
 /* Password box with the Show/Hide button inside it */
@@ -549,28 +1160,22 @@ textarea:focus-visible {
 
 .login .pw {
   width: 100%;
-  padding: 10px 84px 10px 14px;   /* extra space on the right for the button */
-  font: inherit;
-  font-size: 1.1rem;
-  color: var(--text);
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid var(--glass-edge);
+  padding: 12px 88px 12px 16px;
+  font-size: 1.05rem;
   border-radius: 999px;
 }
 
-.login .pw:focus-visible {
-  outline: 2px solid var(--seal-light);
-  outline-offset: 3px;
-}
-
-/* The Show/Hide button */
 .pw-toggle {
   position: absolute;
   top: 50%;
   right: 6px;
-  padding: 4px 14px;
-  font-size: 0.9rem;
+  padding: 5px 14px;
+  font-size: 0.82rem;
   border-color: transparent;
+  transform: translateY(-50%);
+}
+
+.pw-toggle:hover {
   transform: translateY(-50%);
 }
 
@@ -578,97 +1183,40 @@ textarea:focus-visible {
   transform: translateY(-50%) scale(0.97);
 }
 
-/* "That password doesn't match" message */
 .err {
-  margin: 10px 0 0;
+  margin: 12px 0 0;
+  font-size: 0.9rem;
   color: var(--error);
 }
 
 
 /* ==========================================================================
-   9. READER PAGE (what Mariah sees)
-   ========================================================================== */
-
-/* Same ruled look as the writing box, but read-only text */
-.letter-view {
-  min-height: 200px;
-  margin-top: 6px;
-  white-space: pre-wrap;      /* keeps the line breaks you typed */
-  overflow-wrap: anywhere;
-  background: repeating-linear-gradient(
-    transparent,
-    transparent 41px,
-    var(--line) 41px,
-    var(--line) 42px
-  );
-  background-attachment: local;
-  color: var(--ink);
-  font-family: Caveat, cursive, sans-serif;
-  font-size: 1.65rem;
-  line-height: 42px;
-}
-
-
-/* ==========================================================================
-   10. GALLERY
+   12. GALLERY
    ========================================================================== */
 
 /* Upload box */
 .upload {
-  max-width: 520px;
-  margin: 0 auto 8px;
-  padding: 18px;
+  max-width: 560px;
+  margin: 0 auto 10px;
+  padding: 20px;
   text-align: center;
-  background: var(--glass-bg);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-edge);
-  border-radius: 18px;
-  box-shadow: var(--glass-shadow);
 }
 
 .upload small {
   display: block;
   margin-bottom: 10px;
-  opacity: 0.85;
+  color: var(--muted);
 }
 
 .upload input[type="file"] {
   width: 100%;
-  font: inherit;
-  color: var(--text);
-}
-
-.upload input[type="file"]::file-selector-button {
-  margin-right: 12px;
-  padding: 8px 16px;
-  font: inherit;
-  color: var(--text);
-  background: rgba(255, 255, 255, 0.14);
-  border: 1px solid var(--glass-edge);
-  border-radius: 999px;
-  cursor: pointer;
-}
-
-/* Messages like "3 photos added." */
-.note {
-  max-width: 520px;
-  margin: 12px auto;
-  padding: 10px 14px;
-  text-align: center;
-  background: var(--glass-bg);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-edge);
-  border-left: 4px solid var(--seal-light);
-  border-radius: 12px;
 }
 
 /* Photo grid: each photo sits in a glass frame */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 16px;
   margin-top: 28px;
 }
 
@@ -676,28 +1224,25 @@ textarea:focus-visible {
   margin: 0;
   padding: 8px 8px 10px;
   color: var(--ink);
-  background: var(--glass-bg);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-edge);
-  border-radius: 14px;
-  box-shadow: var(--glass-shadow);
+  border-radius: var(--r-md);
 }
 
-/* The picture itself is a button, so it opens with keyboard or touch too */
+/* The picture is a button, so it opens by keyboard or touch too */
 .photo .open {
   display: block;
   width: 100%;
   padding: 0;
+  overflow: hidden;
   background: none;
   border: 0;
-  border-radius: 8px;
-  overflow: hidden;
+  border-radius: var(--r-sm);
+  box-shadow: none;
   cursor: zoom-in;
 }
 
 .photo .open:hover {
   background: none;
+  transform: none;
 }
 
 .photo img {
@@ -705,9 +1250,13 @@ textarea:focus-visible {
   width: 100%;
   aspect-ratio: 1;
   object-fit: cover;
+  transition: transform 0.4s ease;
 }
 
-/* "Maryan · Oct 26, 2026" and the Delete button */
+.photo .open:hover img {
+  transform: scale(1.04);
+}
+
 .photo figcaption {
   display: flex;
   flex-wrap: wrap;
@@ -715,20 +1264,14 @@ textarea:focus-visible {
   align-items: center;
   justify-content: space-between;
   margin-top: 8px;
-  font-family: Caveat, cursive, sans-serif;
-  font-size: 1.1rem;
+  font-family: var(--hand);
+  font-size: 1.15rem;
   color: var(--muted);
 }
 
 .photo .del {
-  padding: 2px 10px;
-  font-size: 0.85rem;
-  color: var(--error);
-  border-color: rgba(255, 179, 191, 0.6);
-}
-
-.photo .del:hover {
-  background: rgba(255, 179, 191, 0.18);
+  padding: 3px 11px;
+  font-size: 0.8rem;
 }
 
 /* Caption row: view it, or open a small box to write one */
@@ -740,14 +1283,14 @@ textarea:focus-visible {
 
 .photo .edit-cap,
 .photo .save {
-  padding: 2px 10px;
-  font-size: 0.85rem;
+  padding: 3px 11px;
+  font-size: 0.8rem;
 }
 
 .photo .cap-text {
   flex: 1 1 100%;
   margin: 4px 0 0;
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   color: var(--ink);
   overflow-wrap: anywhere;
 }
@@ -767,12 +1310,13 @@ textarea:focus-visible {
 .cap-input {
   flex: 1 1 auto;
   min-width: 0;
-  padding: 6px 4px;
+  padding: 7px 4px;
   font: inherit;
   color: var(--ink);
   background: transparent;
   border: 0;
   border-bottom: 1.5px dashed var(--line);
+  border-radius: 0;
 }
 
 .cap-input::placeholder {
@@ -781,10 +1325,11 @@ textarea:focus-visible {
 
 .cap-input:focus {
   outline: none;
-  border-bottom-color: var(--seal-light);
+  border-bottom-color: var(--accent);
 }
 
 .upload .cap-input {
+  width: 100%;
   margin-top: 12px;
 }
 
@@ -799,48 +1344,32 @@ textarea:focus-visible {
 
 .lightbox::backdrop {
   background: rgba(14, 10, 46, 0.88);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
 }
 
 .lightbox img {
   display: block;
   max-width: 95vw;
   max-height: 90vh;
-  border-radius: 8px;
+  border-radius: var(--r-sm);
   cursor: zoom-out;
 }
 
 
 /* ==========================================================================
-   11. PLANNER
+   13. PLANNER AND MOVIES
    ========================================================================== */
 
-/* "Add a task" bar: task name, date, Add button */
+/* "Add a task" bar: name, date, Add button */
 .add {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   align-items: center;
-  max-width: 620px;
-  margin: 0 auto 8px;
-  padding: 16px;
-  background: var(--glass-bg);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-edge);
-  border-radius: 18px;
-  box-shadow: var(--glass-shadow);
-}
-
-.add input[type="text"],
-.add input[type="date"] {
-  padding: 10px 14px;
-  font: inherit;
-  font-size: 1.1rem;
-  color: var(--text);
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid var(--glass-edge);
-  border-radius: 999px;
-  color-scheme: dark;     /* makes the date picker dark */
+  max-width: 640px;
+  margin: 0 auto 10px;
+  padding: 14px;
 }
 
 .add input[type="text"] {
@@ -851,34 +1380,20 @@ textarea:focus-visible {
   flex: 0 0 auto;
 }
 
-.add input::placeholder {
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.add input:focus-visible {
-  outline: 2px solid var(--seal-light);
-  outline-offset: 3px;
-}
-
 /* "3 to do · 5 done" */
 .progress {
   margin: 18px 0 0;
   text-align: center;
-  font-style: italic;
-  text-shadow: 0 2px 14px rgba(10, 6, 40, 0.7);
+  font: italic 500 1.1rem var(--serif);
+  text-shadow: 0 2px 14px rgba(10, 6, 44, 0.6);
 }
 
-/* One day's tasks */
 .day {
   margin-top: 26px;
 }
 
 .day h3 {
-  margin: 0 0 8px;
-  font-size: 1.4rem;
-  font-style: italic;
-  font-weight: 600;
-  text-shadow: 0 2px 14px rgba(10, 6, 40, 0.7);
+  text-shadow: 0 2px 14px rgba(10, 6, 44, 0.6);
 }
 
 /* Days that have already passed with tasks still open */
@@ -888,29 +1403,23 @@ textarea:focus-visible {
 
 .tasks {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);   /* stops long text from stretching the page */
+  grid-template-columns: minmax(0, 1fr);
   gap: 8px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-/* One task, as a glass card */
 .task {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
   align-items: center;
-  padding: 10px 14px;
-  background: var(--glass-bg);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-edge);
-  border-radius: 14px;
-  box-shadow: var(--glass-shadow);
+  padding: 12px 16px;
+  border-radius: var(--r-md);
 }
 
-/* The round tick box on the left */
+/* The round tick box */
 .task .check {
   flex: none;
   display: grid;
@@ -921,17 +1430,21 @@ textarea:focus-visible {
   font-size: 1rem;
   line-height: 1;
   color: #fff;
-  background: rgba(255, 255, 255, 0.12);
-  border: 2px solid var(--glass-edge);
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid var(--glass-edge-hi);
   border-radius: 50%;
 }
 
-.task.done .check {
-  background: var(--seal);
-  border-color: var(--seal-light);
+.task .check:hover {
+  transform: none;
+  background: rgba(255, 255, 255, 0.2);
 }
 
-/* Task name and "added by" line */
+.task.done .check {
+  background: var(--accent-grad);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
 .task .what {
   flex: 1;
   min-width: 0;
@@ -940,45 +1453,32 @@ textarea:focus-visible {
 
 .task .title {
   display: block;
-  font-size: 1.15rem;
+  font-size: 1rem;
   font-weight: 600;
 }
 
 .task .what small {
   display: block;
-  font-size: 0.9rem;
-  opacity: 0.75;
+  font-size: 0.82rem;
+  color: var(--muted);
 }
 
-/* Finished tasks are crossed out and softer */
 .task.done .title {
   text-decoration: line-through;
-  opacity: 0.7;
+  opacity: 0.65;
 }
 
 .task .x {
-  padding: 2px 10px;
-  font-size: 0.85rem;
-  color: var(--error);
-  border-color: rgba(255, 179, 191, 0.6);
+  padding: 4px 12px;
+  font-size: 0.8rem;
 }
 
-.task .x:hover {
-  background: rgba(255, 179, 191, 0.18);
-}
-
-/* "Clear done" button under the Done list */
 .clear {
   margin-top: 14px;
   text-align: center;
 }
 
-
-/* ==========================================================================
-   12. MOVIE CHECKLIST
-   ========================================================================== */
-
-/* Rating and comment under a watched movie, on its own line */
+/* Movie rating and comment, on its own line */
 .review {
   display: flex;
   flex: 1 1 100%;
@@ -988,8 +1488,6 @@ textarea:focus-visible {
   margin-top: 8px;
 }
 
-/* The Save button is first in the HTML so Enter keeps the rating;
-   these orders put it last on screen: stars, comment, then Save */
 .review .stars {
   order: 1;
   display: flex;
@@ -1001,39 +1499,39 @@ textarea:focus-visible {
   order: 2;
   flex: 1 1 160px;
   min-width: 0;
-  padding: 8px 14px;
-  font: inherit;
+  padding: 9px 14px;
+  font: 500 0.95rem var(--sans);
   color: var(--text);
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--field);
   border: 1px solid var(--glass-edge);
   border-radius: 999px;
 }
 
 .review-comment::placeholder {
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.55);
 }
 
 .review .save {
   order: 3;
   flex: none;
-  padding: 6px 16px;
-  font-size: 0.9rem;
+  padding: 7px 16px;
+  font-size: 0.85rem;
 }
 
-/* The five stars you tap to rate a watched movie */
 .review .star {
   padding: 0 2px;
-  font-size: 1.3rem;
+  font-size: 1.35rem;
   line-height: 1;
   color: rgba(255, 255, 255, 0.35);
   background: none;
   border: 0;
-  border-radius: 6px;
+  box-shadow: none;
 }
 
 .review .star:hover {
   background: none;
   color: #f5c451;
+  transform: none;
 }
 
 .review .star.on {
@@ -1042,94 +1540,54 @@ textarea:focus-visible {
 
 
 /* ==========================================================================
-   13. REPLIES
-   Mariah's replies under each letter.
+   14. MOTION
+   Pages fade up gently when they open.
    ========================================================================== */
 
-/* The little "💬 2" next to a letter's title */
-.badge {
-  display: inline-block;
-  margin-left: 8px;
-  padding: 1px 9px;
-  font-size: 0.85rem;
-  font-weight: 400;
-  background: rgba(255, 255, 255, 0.18);
-  border: 1px solid var(--glass-edge);
-  border-radius: 999px;
+main > * {
+  animation: rise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 
-/* The replies area under a letter */
-.replies {
-  margin-top: 8px;
+main > *:nth-child(2) { animation-delay: 0.04s; }
+main > *:nth-child(3) { animation-delay: 0.08s; }
+main > *:nth-child(4) { animation-delay: 0.12s; }
+main > *:nth-child(5) { animation-delay: 0.16s; }
+main > *:nth-child(6) { animation-delay: 0.2s; }
+main > *:nth-child(n+7) { animation-delay: 0.24s; }
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: none; }
 }
 
-/* One reply, as a glass card with handwriting */
-.reply {
-  margin-bottom: 10px;
-  padding: 14px 16px;
-  background: var(--glass-bg);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-edge);
-  border-radius: 14px;
-  box-shadow: var(--glass-shadow);
+/* No movement for people who turned animations off */
+@media (prefers-reduced-motion: reduce) {
+  main > *,
+  .banner,
+  .seal div {
+    animation: none;
+  }
+
+  .tile,
+  .item,
+  button {
+    transition: none;
+  }
 }
 
-.reply p {
-  margin: 0;
-  white-space: pre-wrap;          /* keeps the line breaks she typed */
-  overflow-wrap: anywhere;
-  font-family: Caveat, cursive, sans-serif;
-  font-size: 1.5rem;
-  line-height: 1.35;
-}
-
-.reply .meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 8px;
-  font-size: 0.95rem;
-  color: var(--muted);
-}
-
-.reply .x {
-  padding: 2px 10px;
-  font-size: 0.85rem;
-  color: var(--error);
-  border-color: rgba(255, 179, 191, 0.6);
-}
-
-.reply .x:hover {
-  background: rgba(255, 179, 191, 0.18);
-}
-
-/* The box where Mariah types her reply (a plain glass box, no ruled lines) */
-textarea.reply-text {
-  min-height: 130px;
-  margin-top: 4px;
-  padding: 12px 14px;
-  font-size: 1.5rem;
-  line-height: 1.35;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid var(--glass-edge);
-  border-radius: 14px;
-}
-
-textarea.reply-text:focus {
-  outline: 2px solid var(--seal-light);
-  outline-offset: 3px;
-  border-color: var(--glass-edge);
+/* Older browsers that can't blur: make the glass darker so text stays readable */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root {
+    --glass-bg: rgba(34, 22, 96, 0.82);
+  }
 }
 
 
 /* ==========================================================================
-   14. PRINT
+   15. PRINT
+   Plain white page with dark writing; only the letter.
    ========================================================================== */
 
-/* When printing: plain white page with dark writing, only the letter */
 @media print {
   :root {
     --ink: #222222;
@@ -1142,14 +1600,22 @@ textarea.reply-text:focus {
     color: #222;
   }
 
-  body::before {
+  body::before,
+  body::after {
     display: none;
   }
 
+  main > * {
+    animation: none;
+  }
+
   .nav,
+  .tiles,
+  .tabs,
   .bar,
   .shelf,
   .replies,
+  .banner,
   .foot button,
   .who,
   h1,
@@ -1167,49 +1633,53 @@ textarea.reply-text:focus {
   }
 }
 
-/* Older browsers that can't blur: make the glass a bit darker so text stays readable */
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  :root {
-    --glass-bg: rgba(34, 22, 96, 0.78);
-  }
-}
-
 
 /* ==========================================================================
-   15. PHONES AND TOUCH SCREENS
-   Overrides the rules above on small screens.
+   16. PHONES AND TOUCH SCREENS
    ========================================================================== */
 
-/* Narrow screens (phones) */
 @media (max-width: 700px) {
-  /* Photo strips sit at the edges, partly hidden behind the glass */
-  body::before {
-    background-position: left -110px center, right -110px center, center, center;
+  /* Photo strips peek in from the edges, softer */
+  body::after {
+    opacity: 0.55;
+    background-position: left -140px center, right -140px center;
   }
 
   main {
-    padding: 18px 14px 48px;
+    padding: 18px 14px 56px;
   }
 
   h2 {
-    margin-top: 34px;
+    margin-top: 32px;
   }
 
-  /* Section buttons fall into two per row on phones */
-  .nav {
-    grid-template-columns: 1fr 1fr;
-    max-width: 420px;
+  /* Dashboard */
+  .tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
   }
 
-  /* Panels get a bit less padding so there's more room for writing */
-  .paper,
-  .login,
-  .upload,
-  .add {
+  .tile {
+    padding: 14px;
+  }
+
+  .panel {
     padding: 18px 16px;
   }
 
+  .panel-head {
+    align-items: flex-start;
+  }
+
+  .picgrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   /* Letter writing */
+  .paper {
+    padding: 22px 18px;
+  }
+
   .row,
   .sig {
     font-size: 1.5rem;
@@ -1224,7 +1694,6 @@ textarea.reply-text:focus {
     font-size: 1.5rem;
   }
 
-  /* Replies */
   .reply p {
     font-size: 1.4rem;
   }
@@ -1251,11 +1720,11 @@ textarea.reply-text:focus {
     order: -1;
   }
 
-  /* Saved letters: small, tidy cards with a one-line preview */
+  /* Letters list: slim cards */
   .item {
     gap: 10px;
-    padding: 8px 12px;
-    border-radius: 12px;
+    padding: 9px 12px;
+    border-radius: var(--r-sm);
   }
 
   .item .dot {
@@ -1265,24 +1734,18 @@ textarea.reply-text:focus {
 
   .item .t b {
     overflow: hidden;
-    font-size: 1rem;
+    font-size: 0.94rem;
     white-space: nowrap;
     text-overflow: ellipsis;
   }
 
   .item .t span {
-    font-size: 0.88rem;
-  }
-
-  .shelf .item button {
-    min-height: 34px;
-    padding: 2px 12px;
-    font-size: 0.8rem;
+    font-size: 0.84rem;
   }
 
   /* Gallery: two photos per row */
   .grid {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
   }
 
@@ -1290,14 +1753,19 @@ textarea.reply-text:focus {
     padding: 6px 6px 8px;
   }
 
-  /* Planner: task name on its own row, then the date and Add button */
+  /* Planner: task name on its own row */
+  .upload,
+  .add,
+  .login {
+    padding: 18px 16px;
+  }
+
   .add input[type="text"] {
     flex: 1 1 100%;
   }
 
   .add input[type="date"] {
     flex: 1 1 0;
-    min-width: 0;
   }
 
   .task {
@@ -1305,9 +1773,8 @@ textarea.reply-text:focus {
     padding: 10px 12px;
   }
 
-  .task .check {
-    width: 40px;
-    height: 40px;
+  .sform {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -1315,13 +1782,14 @@ textarea.reply-text:focus {
 @media (pointer: coarse) {
   button {
     min-height: 44px;
-    touch-action: manipulation;   /* no delay or accidental zoom on double tap */
+    touch-action: manipulation;
   }
 
   .item button,
   .photo .del,
   .task .x,
-  .reply .x {
+  .reply .x,
+  .pic .del {
     min-height: 38px;
     padding: 4px 14px;
   }
@@ -1337,541 +1805,6 @@ textarea.reply-text:focus {
   }
 
   .who a {
-    padding: 10px 6px;
-  }
-}
-
-
-/* ==========================================================================
-   16. SCHEDULE DASHBOARD
-   ========================================================================== */
-
-/* Four section buttons fit in one row on computers (phones keep two per row) */
-@media (min-width: 701px) {
-  .nav {
-    grid-template-columns: repeat(4, 1fr);
-    max-width: 640px;
-  }
-}
-
-/* Both / Maryan / Mariah tabs */
-.tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-  margin: 0 0 18px;
-}
-
-.tabs a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 40px;
-  padding: 6px 18px;
-  color: var(--text);
-  text-decoration: none;
-  background: rgba(255, 255, 255, 0.14);
-  border: 1px solid var(--glass-edge);
-  border-radius: 999px;
-}
-
-.tabs a.on {
-  font-weight: 600;
-  background: var(--seal);
-  border-color: var(--seal-light);
-}
-
-/* Glass boxes: the Today card, the Add form and each day of the week */
-.panel,
-.dayblock {
-  padding: 16px 18px;
-  background: var(--glass-bg);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-edge);
-  border-radius: 18px;
-  box-shadow: var(--glass-shadow);
-}
-
-.panel > h2 {
-  margin: 0 0 2px;
-}
-
-.panel-sub {
-  margin: 0 0 12px;
-  font-style: italic;
-  opacity: 0.85;
-}
-
-.dayblock {
-  margin-top: 12px;
-}
-
-.dayblock h3 {
-  margin: 0 0 8px;
-  font-size: 1.35rem;
-  font-style: italic;
-  font-weight: 600;
-}
-
-.today-badge {
-  margin-left: 10px;
-  padding: 1px 11px;
-  font-size: 0.8rem;
-  font-style: normal;
-  font-weight: 600;
-  vertical-align: middle;
-  background: var(--seal);
-  border-radius: 999px;
-}
-
-/* The list of classes */
-.slots {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 8px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-/* One class: time on the left, subject on the right, coloured by person */
-.slot {
-  --c: #c9b8ff;
-  display: grid;
-  grid-template-columns: 90px minmax(0, 1fr);
-  gap: 4px 12px;
-  align-items: start;
-  padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid var(--glass-edge);
-  border-left: 5px solid var(--c);
-  border-radius: 12px;
-}
-
-.slot.maryan { --c: #8fc1ff; }
-.slot.mariah { --c: #ff9ccf; }
-
-.slot.done {
-  opacity: 0.55;
-}
-
-.slot.now {
-  background: rgba(255, 255, 255, 0.22);
-  box-shadow: 0 0 0 2px var(--c);
-}
-
-.when b {
-  display: block;
-  font-size: 1.02rem;
-  line-height: 1.25;
-}
-
-.when span {
-  display: block;
-  font-size: 0.88rem;
-  opacity: 0.8;
-}
-
-.what {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.subject {
-  display: block;
-  font-size: 1.2rem;
-  font-weight: 600;
-  line-height: 1.25;
-}
-
-.what small {
-  display: block;
-  margin-top: 2px;
-  font-size: 0.92rem;
-  opacity: 0.85;
-}
-
-/* The little name tag: Maryan (blue) and Mariah (pink) */
-.chip {
-  display: inline-block;
-  padding: 0 9px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: #1c1646;
-  background: #c9b8ff;
-  border-radius: 999px;
-}
-
-.chip.maryan { background: #8fc1ff; }
-.chip.mariah { background: #ff9ccf; }
-
-/* Now / Next / Done tags next to today's subjects */
-.state {
-  display: inline-block;
-  margin-left: 8px;
-  padding: 0 9px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  vertical-align: middle;
-  border-radius: 999px;
-}
-
-.state.now  { color: #fff; background: var(--seal); }
-.state.next { color: #2b2350; background: rgba(255, 255, 255, 0.92); }
-.state.done { background: rgba(255, 255, 255, 0.22); }
-
-/* Edit button and form inside a class */
-.slot-tools {
-  grid-column: 1 / -1;
-}
-
-.edit-class summary,
-.add-class > summary {
-  list-style: none;
-  cursor: pointer;
-}
-
-.edit-class summary::-webkit-details-marker,
-.add-class > summary::-webkit-details-marker {
-  display: none;
-}
-
-.edit-class summary {
-  display: inline-flex;
-  align-items: center;
-  min-height: 34px;
-  padding: 2px 16px;
-  font-size: 0.85rem;
-  background: rgba(255, 255, 255, 0.14);
-  border: 1px solid var(--glass-edge);
-  border-radius: 999px;
-}
-
-.add-class {
-  margin-top: 14px;
-}
-
-.add-class > summary {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 44px;
-  font-size: 1.1rem;
-  font-weight: 600;
-}
-
-/* The form used to add or change a class */
-.sform {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-  margin-top: 12px;
-}
-
-.sform label {
-  display: block;
-  font-size: 0.92rem;
-  color: var(--muted);
-}
-
-.sform .wide {
-  grid-column: 1 / -1;
-}
-
-.sform input,
-.sform select {
-  display: block;
-  width: 100%;
-  min-width: 0;
-  margin-top: 4px;
-  padding: 9px 12px;
-  font: inherit;
-  font-size: 1.05rem;
-  color: var(--text);
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid var(--glass-edge);
-  border-radius: 12px;
-  color-scheme: dark;   /* dark time picker and drop-down lists */
-}
-
-.sform input::placeholder {
-  color: rgba(255, 255, 255, 0.55);
-}
-
-.sform input:focus-visible,
-.sform select:focus-visible {
-  outline: 2px solid var(--seal-light);
-  outline-offset: 3px;
-}
-
-.sform .btns {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  grid-column: 1 / -1;
-}
-
-.sform .del {
-  color: var(--error);
-  border-color: rgba(255, 179, 191, 0.6);
-}
-
-/* Phones */
-@media (max-width: 700px) {
-  .panel,
-  .dayblock {
-    padding: 14px 12px;
-  }
-
-  .slot {
-    grid-template-columns: 76px minmax(0, 1fr);
-    gap: 4px 10px;
-  }
-
-  .subject {
-    font-size: 1.12rem;
-  }
-}
-
-/* Printing the schedule: plain white page, dark text, no buttons */
-@media print {
-  .tabs,
-  .add-class,
-  .slot-tools {
-    display: none;
-  }
-
-  .panel,
-  .dayblock {
-    background: none;
-    border: 1px solid #cccccc;
-    box-shadow: none;
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
-
-  .dayblock h3 {
-    color: #222222;
-    text-shadow: none;
-  }
-}
-
-
-/* ==========================================================================
-   17. SCHEDULE PICTURES
-   ========================================================================== */
-
-.pics {
-  margin-bottom: 14px;
-}
-
-/* One picture per row on phones, side by side on computers */
-.picgrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.pic {
-  margin: 0;
-  padding: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid var(--glass-edge);
-  border-radius: 14px;
-}
-
-.pic a {
-  display: block;
-  overflow: hidden;
-  background: rgba(10, 6, 40, 0.25);
-  border-radius: 10px;
-}
-
-/* The whole picture shows, even tall ones; tap it to open it full size */
-.pic img {
-  display: block;
-  width: 100%;
-  height: auto;
-  max-height: 520px;
-  object-fit: contain;
-}
-
-.pic figcaption {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 10px;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 8px;
-  font-size: 0.92rem;
-  overflow-wrap: anywhere;
-}
-
-.pic .del {
-  padding: 2px 12px;
-  font-size: 0.85rem;
-  color: var(--error);
-  border-color: rgba(255, 179, 191, 0.6);
-}
-
-.pic .del:hover {
-  background: rgba(255, 179, 191, 0.18);
-}
-
-.pic-add {
-  margin-top: 6px;
-}
-
-/* The "choose a file" box in the post form */
-.sform input[type="file"] {
-  padding: 8px 10px;
-}
-
-.sform input[type="file"]::file-selector-button {
-  margin-right: 10px;
-  padding: 6px 14px;
-  font: inherit;
-  color: var(--text);
-  background: rgba(255, 255, 255, 0.14);
-  border: 1px solid var(--glass-edge);
-  border-radius: 999px;
-  cursor: pointer;
-}
-
-@media (max-width: 700px) {
-  .pic img {
-    max-height: 420px;
-  }
-}
-
-@media (pointer: coarse) {
-  .pic .del {
-    min-height: 38px;
-    padding: 4px 14px;
-  }
-}
-
-@media print {
-  .pic-add,
-  .pic form {
-    display: none;
-  }
-}
-
-
-/* ==========================================================================
-   18. DAY COUNTER AND MONTHSARY BANNER
-   ========================================================================== */
-
-/* The glowing banner on the 15th */
-.banner {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  justify-content: center;
-  margin: 0 0 14px;
-  padding: 14px 16px;
-  text-align: center;
-  color: #fff;
-  background: linear-gradient(110deg, #c9304a, #e0559a, #9a63d6, #e0559a, #c9304a);
-  background-size: 250% 100%;
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  border-radius: 18px;
-  box-shadow:
-    0 8px 32px rgba(158, 27, 50, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  animation:
-    banner-pop 0.6s cubic-bezier(0.2, 1.4, 0.4, 1),
-    banner-shine 6s linear infinite;
-}
-
-.banner.anniversary {
-  background: linear-gradient(110deg, #f5c451, #ff9ccf, #9a63d6, #ff9ccf, #f5c451);
-  background-size: 250% 100%;
-}
-
-.banner-text b {
-  display: block;
-  font-size: clamp(1.5rem, 6vw, 2.1rem);
-  font-style: italic;
-  font-weight: 600;
-  line-height: 1.15;
-  text-shadow: 0 2px 10px rgba(10, 6, 40, 0.5);
-}
-
-.banner-text small {
-  display: block;
-  margin-top: 2px;
-  font-size: 1rem;
-  opacity: 0.95;
-  text-shadow: 0 1px 6px rgba(10, 6, 40, 0.5);
-}
-
-.banner-icon {
-  font-size: 1.8rem;
-}
-
-@keyframes banner-pop {
-  from {
-    transform: scale(0.85);
-    opacity: 0;
-  }
-  to {
-    transform: none;
-    opacity: 1;
-  }
-}
-
-@keyframes banner-shine {
-  from { background-position: 0% 0; }
-  to   { background-position: 250% 0; }
-}
-
-/* The day counter card */
-.counter {
-  margin-bottom: 14px;
-  text-align: center;
-}
-
-.count-label {
-  margin: 0;
-  font-size: 1.15rem;
-  font-style: italic;
-  opacity: 0.95;
-}
-
-.count-num {
-  margin: 0 0 4px;
-  font-size: clamp(3.2rem, 16vw, 5rem);
-  font-style: italic;
-  font-weight: 600;
-  line-height: 1.05;
-  text-shadow: 0 2px 16px rgba(10, 6, 40, 0.5);
-}
-
-.count-break {
-  margin: 0;
-  font-size: 1.1rem;
-  font-weight: 600;
-}
-
-.count-next {
-  margin: 6px 0 0;
-  font-size: 0.95rem;
-  opacity: 0.85;
-}
-
-/* No movement for people who turned animations off */
-@media (prefers-reduced-motion: reduce) {
-  .banner {
-    animation: none;
-  }
-}
-
-@media print {
-  .banner {
-    display: none;
+    padding: 10px 4px;
   }
 }
