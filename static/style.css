@@ -1808,3 +1808,253 @@ main > *:nth-child(n+7) { animation-delay: 0.24s; }
     padding: 10px 4px;
   }
 }
+
+/* ==========================================================================
+   17. MOVIE REVIEWS
+   ========================================================================== */
+
+/* Visually hidden text that screen readers still read */
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* One watched movie, as a glass card */
+.film {
+  margin-top: 12px;
+  padding: 16px 18px;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--r-lg);
+  box-shadow: var(--glass-shadow);
+}
+
+.film-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.film-main {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.film-title {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.film-avg {
+  display: block;
+  font-size: 0.84rem;
+  color: var(--muted);
+}
+
+/* The round ✓ that moves a movie back to "To watch" */
+.check-btn {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  font-size: 1rem;
+  line-height: 1;
+  color: #fff;
+  background: var(--accent-grad);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+}
+
+.check-btn:hover {
+  transform: none;
+  filter: brightness(1.12);
+}
+
+/* Stars shown on a review or in the average */
+.rv-stars {
+  display: inline-block;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.28);
+}
+
+.rv-stars .on {
+  color: #f5c451;
+}
+
+/* The list of reviews under a movie */
+.rvlist {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rv {
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--r-sm);
+}
+
+.rv .rv-stars {
+  font-size: 1.05rem;
+}
+
+.rv-comment {
+  margin: 4px 0 0;
+  font-family: var(--hand);
+  font-size: 1.4rem;
+  line-height: 1.3;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.rv-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.rv-meta .x {
+  padding: 3px 11px;
+  font-size: 0.78rem;
+}
+
+/* "＋ Add another review" */
+.rev-add > summary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  margin-top: 14px;
+  list-style: none;
+  cursor: pointer;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1.5px dashed var(--glass-edge-hi);
+  border-radius: 14px;
+  transition: background 0.18s ease;
+}
+
+.rev-add > summary::-webkit-details-marker {
+  display: none;
+}
+
+.rev-add > summary:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.rev-form {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.rev-as {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* The star picker: tap a star to rate. The order is reversed in the code
+   so that the stars to the left of the one you pick light up too. */
+.rate {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  gap: 2px;
+}
+
+.rate input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.rate label {
+  padding: 0 3px;
+  font-size: 2rem;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.28);
+  cursor: pointer;
+  transition: color 0.12s ease, transform 0.12s ease;
+}
+
+.rate input:checked ~ label,
+.rate label:hover,
+.rate label:hover ~ label {
+  color: #f5c451;
+}
+
+.rate label:hover {
+  transform: scale(1.12);
+}
+
+.rate input:focus-visible + label {
+  outline: 2px solid var(--accent);
+  border-radius: 6px;
+}
+
+/* The comment box: a plain box, not the ruled letter paper */
+textarea.rev-text {
+  min-height: 90px;
+  margin-top: 0;
+  padding: 12px 14px;
+  font: 500 1rem / 1.45 var(--sans);
+  background: var(--field);
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--r-sm);
+}
+
+textarea.rev-text:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+@media (max-width: 700px) {
+  .film {
+    padding: 14px 12px;
+  }
+
+  .rate label {
+    padding: 0 5px;
+    font-size: 2.2rem;
+  }
+
+  textarea.rev-text {
+    min-height: 80px;
+    font-size: 1rem;
+  }
+}
+
+@media (pointer: coarse) {
+  .rv-meta .x {
+    min-height: 38px;
+    padding: 4px 14px;
+  }
+
+  .check-btn {
+    width: 40px;
+    height: 40px;
+    min-height: 40px;
+  }
+}

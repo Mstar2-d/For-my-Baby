@@ -456,10 +456,12 @@ def planner_clear():
 
 # ---------- Movie checklist (Maryan and Mariah) ----------
 
+# ---------- Movie checklist (Maryan and Mariah) ----------
+
 @app.get("/movies")
 @login_required
 def movies_page():
-    return render_template("movies.html", board=movies.board())
+    return render_template("movies.html", board=movies.board(), me=who_is_logged_in())
 
 
 @app.post("/movies/add")
@@ -480,11 +482,21 @@ def movie_toggle(movie_id):
 @app.post("/movies/review/<movie_id>")
 @login_required
 def movie_review(movie_id):
-    movies.save_review(
+    error = movies.add_review(
         movie_id,
-        request.form.get("rating", "0"),
+        who_is_logged_in(),
+        request.form.get("rating", ""),
         request.form.get("comment", ""),
     )
+    if error:
+        flash(error)
+    return redirect(url_for("movies_page"))
+
+
+@app.post("/movies/review/delete/<review_id>")
+@login_required
+def movie_review_delete(review_id):
+    movies.delete_review(review_id, who_is_logged_in())
     return redirect(url_for("movies_page"))
 
 
@@ -492,13 +504,6 @@ def movie_review(movie_id):
 @login_required
 def movie_delete(movie_id):
     movies.delete_movie(movie_id)
-    return redirect(url_for("movies_page"))
-
-
-@app.post("/movies/clear-watched")
-@login_required
-def movie_clear():
-    movies.clear_watched()
     return redirect(url_for("movies_page"))
 
 
