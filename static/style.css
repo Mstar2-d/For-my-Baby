@@ -2141,3 +2141,335 @@ textarea.rev-text:focus {
     justify-content: center;
   }
 }
+/* ==========================================================================
+   19. DASHBOARD LAYOUT
+   Phones and small screens: the page scrolls like normal.
+   Laptops and large screens: the dashboard fits one screen, with no scrolling.
+   ========================================================================== */
+
+/* ----- Works at every size ----- */
+
+.topbar {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.topbar .hello { margin: 0; }
+.topbar .who { flex: none; }
+
+.tile-text {
+  display: grid;
+  min-width: 0;
+}
+
+.head-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.post-btn {
+  padding: 8px 16px;
+  font-size: 0.85rem;
+}
+
+/* Schedule pictures: a stacked list (laptops turn this into a one-at-a-time viewer) */
+.slides {
+  display: grid;
+  gap: 12px;
+}
+
+.slide {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--r-md);
+}
+
+.slide .shot {
+  display: block;
+  overflow: hidden;
+  background: rgba(10, 6, 44, 0.3);
+  border-radius: var(--r-sm);
+}
+
+.slide .shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 440px;
+  object-fit: contain;
+}
+
+.cap {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.cap-who {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.arrow,
+.pic-count {
+  display: none;
+}
+
+.no-pics {
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+  padding: 18px 0;
+  text-align: center;
+}
+
+/* The post popup */
+.postdlg {
+  width: min(440px, 92vw);
+  padding: 20px;
+  color: var(--text);
+  background:
+    linear-gradient(150deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.03)),
+    rgba(36, 26, 104, 0.95);
+  border: 1px solid var(--glass-edge-hi);
+  border-radius: var(--r-lg);
+  box-shadow: 0 30px 80px rgba(8, 4, 40, 0.7);
+}
+
+.postdlg::backdrop {
+  background: rgba(14, 10, 46, 0.65);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.dlg-head {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dlg-head h3 { margin: 0; }
+.dlg-head button { padding: 6px 12px; }
+
+
+/* ----- Laptops and big screens: fits one screen, no scrolling ----- */
+
+@media (min-width: 900px) and (min-height: 560px) {
+  html:has(body.fit) {
+    overflow: hidden;
+  }
+
+  body.fit {
+    height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    overflow: hidden;
+  }
+
+  body.fit .fit-main {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    height: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 14px 20px 18px;
+  }
+
+  body.fit .fit-main > * { flex: none; }
+
+  /* Top bar */
+  .topbar {
+    align-items: flex-end;
+    margin: 0;
+  }
+
+  .topbar .who {
+    align-self: flex-start;
+    white-space: nowrap;
+  }
+
+  body.fit .hello h1 {
+    margin: 2px 0;
+    font-size: clamp(2rem, 4dvh + 1rem, 2.8rem);
+  }
+
+  body.fit .hello .sub { font-size: 0.9rem; }
+
+  /* Section tiles: a slim row */
+  body.fit .tiles {
+    margin: 0;
+    gap: 10px;
+  }
+
+  body.fit .tile {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+  }
+
+  body.fit .tile-ico {
+    flex: none;
+    width: 42px;
+    height: 42px;
+    margin: 0;
+  }
+
+  .tile-text small {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  /* Banner on the 15th: a slim strip */
+  body.fit .banner {
+    margin: 0;
+    padding: 8px 14px;
+  }
+
+  body.fit .banner-text b { font-size: clamp(1.15rem, 4.5vw, 1.6rem); }
+  body.fit .banner-text small { font-size: 0.82rem; }
+  body.fit .banner-icon { font-size: 1.35rem; }
+
+  /* Messages float on top so they never push the layout */
+  body.fit .note {
+    position: fixed;
+    top: calc(10px + env(safe-area-inset-top, 0px));
+    left: 0;
+    right: 0;
+    z-index: 40;
+    width: fit-content;
+    max-width: min(92vw, 520px);
+    margin: 0 auto;
+  }
+
+  /* Counter and pictures share the remaining height */
+  body.fit .dash {
+    flex: 1 1 0;
+    min-height: 0;
+    grid-template-columns: 330px minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    align-items: stretch;
+    gap: 14px;
+  }
+
+  body.fit .dash .hero {
+    position: static;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 0;
+    padding: 18px;
+    overflow: hidden;
+  }
+
+  body.fit .ring {
+    width: min(200px, 30dvh);
+    margin: 12px auto;
+  }
+
+  body.fit .pics {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    margin: 0;
+    padding: 16px 18px;
+  }
+
+  body.fit .pics .panel-head {
+    flex: none;
+    margin-bottom: 10px;
+  }
+
+  body.fit .pics h2 { font-size: 1.4rem; }
+  body.fit .pics .panel-sub { font-size: 0.82rem; }
+
+  /* Pictures: one at a time, scaled to fit */
+  body.fit .slides {
+    position: relative;
+    display: block;
+    flex: 1 1 0;
+    min-height: 160px;
+  }
+
+  body.fit .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: 0;
+  }
+
+  body.fit .slide.on { display: flex; }
+
+  body.fit .slide .shot {
+    display: flex;
+    flex: 1 1 0;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+    border-radius: var(--r-md);
+  }
+
+  body.fit .slide .shot img {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  body.fit .arrow {
+    display: block;
+    position: absolute;
+    top: calc(50% - 22px);
+    z-index: 2;
+    width: 40px;
+    height: 40px;
+    padding: 0 0 3px;
+    font-size: 1.5rem;
+    line-height: 1;
+    background: rgba(20, 12, 70, 0.6);
+    border-radius: 50%;
+  }
+
+  body.fit .arrow.prev { left: 8px; }
+  body.fit .arrow.next { right: 8px; }
+
+  body.fit .pic-count {
+    display: block;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 2;
+    padding: 2px 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: rgba(20, 12, 70, 0.6);
+    border: 1px solid var(--glass-edge);
+    border-radius: 999px;
+  }
+
+  body.fit .no-pics {
+    flex: 1 1 0;
+    min-height: 0;
+    align-content: center;
+  }
+}
