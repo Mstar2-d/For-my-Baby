@@ -18,7 +18,11 @@
     13. Planner and movies
     14. Motion
     15. Print
-    16. Phones and touch screens (last, so it wins)
+    16. Phones and touch screens
+    17. Movie reviews
+    18. Reviews button
+    19. Dashboard layout (fixed screen on laptops only)
+    20. Series and episode tracker
    ========================================================================== */
 
 
@@ -418,7 +422,7 @@ input[type="file"]::file-selector-button {
    6. NAVIGATION
    ========================================================================== */
 
-/* Pill bar on the letters pages: Dashboard, Gallery, Planner, Movies */
+/* Pill bar (used on pages that still show one) */
 .nav {
   display: flex;
   gap: 4px;
@@ -1809,6 +1813,7 @@ main > *:nth-child(n+7) { animation-delay: 0.24s; }
   }
 }
 
+
 /* ==========================================================================
    17. MOVIE REVIEWS
    ========================================================================== */
@@ -2059,6 +2064,7 @@ textarea.rev-text:focus {
   }
 }
 
+
 /* ==========================================================================
    18. REVIEWS BUTTON (reviews stay hidden until you tap it)
    ========================================================================== */
@@ -2067,7 +2073,7 @@ textarea.rev-text:focus {
   margin-top: 12px;
 }
 
-/* The "Reviews" button */
+/* The "Reviews" / "Episodes" button */
 .rv-toggle > summary {
   display: inline-flex;
   align-items: center;
@@ -2092,7 +2098,7 @@ textarea.rev-text:focus {
   border-color: var(--glass-edge-hi);
 }
 
-/* The number of reviews */
+/* The number of reviews or episodes */
 .rv-count {
   display: inline-grid;
   place-items: center;
@@ -2105,7 +2111,7 @@ textarea.rev-text:focus {
   border-radius: 999px;
 }
 
-/* A small arrow that flips when the reviews are open */
+/* A small arrow that flips when it's open */
 .rv-toggle > summary::after {
   content: "▾";
   font-size: 0.85rem;
@@ -2141,6 +2147,8 @@ textarea.rev-text:focus {
     justify-content: center;
   }
 }
+
+
 /* ==========================================================================
    19. DASHBOARD LAYOUT
    Phones and small screens: the page scrolls like normal.
@@ -2197,7 +2205,7 @@ textarea.rev-text:focus {
 .slide .shot {
   display: block;
   overflow: hidden;
-  background: rgba(10, 6, 44, 0.3);
+  background: rgba(10, 6, 40, 0.3);
   border-radius: var(--r-sm);
 }
 
@@ -2471,5 +2479,313 @@ textarea.rev-text:focus {
     flex: 1 1 0;
     min-height: 0;
     align-content: center;
+  }
+}
+
+
+/* ==========================================================================
+   20. SERIES AND EPISODE TRACKER
+   ========================================================================== */
+
+/* "Pick the right series" results */
+.results,
+.show {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--r-lg);
+  box-shadow: var(--glass-shadow);
+}
+
+.results {
+  margin: 0 0 18px;
+  padding: 18px;
+}
+
+.results h2 {
+  margin: 0 0 2px;
+}
+
+.res-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.res {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--r-md);
+}
+
+.res img,
+.noimg {
+  flex: none;
+  width: 52px;
+  height: 74px;
+  object-fit: cover;
+  background: rgba(10, 6, 44, 0.3);
+  border-radius: 8px;
+}
+
+.noimg {
+  display: grid;
+  place-items: center;
+  font-size: 1.4rem;
+}
+
+.res-main {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.res-main b {
+  display: block;
+}
+
+.res-main small {
+  color: var(--muted);
+}
+
+/* One series */
+.show {
+  margin-top: 12px;
+  padding: 16px 18px;
+}
+
+.done-chip {
+  background: #9be7b6;
+}
+
+/* Progress bar */
+.pgs {
+  height: 8px;
+  margin-top: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+}
+
+.pgs span {
+  display: block;
+  height: 100%;
+  background: var(--accent-grad);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.pgs-text {
+  margin: 6px 0 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+/* "Next up" strip */
+.next-up {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--r-sm);
+}
+
+.next-up > div {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.next-up small {
+  display: block;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.next-up b {
+  font-size: 0.95rem;
+}
+
+/* A season: tap to open its episodes */
+.season {
+  margin-top: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--r-md);
+}
+
+.season > summary {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  list-style: none;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.season > summary::-webkit-details-marker {
+  display: none;
+}
+
+.season > summary::after {
+  content: "▾";
+  margin-left: 4px;
+  font-size: 0.85rem;
+  opacity: 0.8;
+  transition: transform 0.2s ease;
+}
+
+.season[open] > summary::after {
+  transform: rotate(180deg);
+}
+
+.se-count {
+  flex: 1;
+  text-align: right;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.se-body {
+  padding: 0 14px 12px;
+}
+
+/* Episode rows */
+.eps {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ep {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  align-items: center;
+  padding: 6px 4px;
+  border-radius: 10px;
+}
+
+.ep:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.ep-check {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  font-size: 0.95rem;
+  line-height: 1;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid var(--glass-edge-hi);
+  border-radius: 50%;
+}
+
+.ep-check:hover {
+  transform: none;
+}
+
+.ep-check:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.ep.done .ep-check {
+  background: var(--accent-grad);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.ep-num {
+  min-width: 2.2ch;
+  font-weight: 700;
+  text-align: right;
+  color: var(--muted);
+}
+
+.ep-name {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.ep.done .ep-name {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.ep.soon {
+  opacity: 0.65;
+}
+
+.ep-date {
+  font-size: 0.78rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* Check for new episodes / Remove series */
+.show-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--glass-edge);
+}
+
+.credit {
+  margin: 30px 0 0;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.credit a {
+  color: inherit;
+}
+
+@media (max-width: 700px) {
+  .show {
+    padding: 14px 12px;
+  }
+
+  .next-up {
+    flex-wrap: wrap;
+  }
+
+  .ep-date {
+    flex: 1 1 100%;
+    padding-left: calc(30px + 2.2ch + 20px);
+  }
+}
+
+@media (pointer: coarse) {
+  .ep-check {
+    width: 38px;
+    height: 38px;
+    min-height: 38px;
   }
 }

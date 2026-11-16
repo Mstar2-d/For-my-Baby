@@ -14,6 +14,7 @@ import drive_store
 import movies
 import planner
 import schedule_pics
+import series
 import timetable
 import together
 
@@ -25,7 +26,7 @@ HER_NAME = "Mariah"
 MY_NAME = "Maryan"
 MAX_REPLY = 2000   # longest reply, in characters
 
-# The tabs on the schedule page: web address word -> whose classes to show
+# The tabs on the dashboard: web address word -> whose pictures to show
 WHO_FILTERS = {"maryan": MY_NAME, "mariah": HER_NAME}
 
 # The password decides who gets in.
@@ -152,16 +153,16 @@ def logout():
 
 @app.get("/")
 def home():
-    """The front door: after logging in, the schedule dashboard comes first."""
+    """The front door: after logging in, the dashboard comes first."""
     if session.get("role") not in ("writer", "reader"):
         return redirect(url_for("login"))
     return redirect(url_for("schedule_page"))
 
 
-# ---------- Schedule dashboard (Maryan and Mariah) ----------
+# ---------- Dashboard (Maryan and Mariah) ----------
 
 def schedule_url():
-    """Goes back to the schedule, keeping whichever tab was open."""
+    """Goes back to the dashboard, keeping whichever tab was open."""
     view = request.form.get("view", "")
     if view in WHO_FILTERS:
         return url_for("schedule_page", who=view)
@@ -456,12 +457,17 @@ def planner_clear():
 
 # ---------- Movie checklist (Maryan and Mariah) ----------
 
-# ---------- Movie checklist (Maryan and Mariah) ----------
-
 @app.get("/movies")
 @login_required
 def movies_page():
-    return render_template("movies.html", board=movies.board(), me=who_is_logged_in())
+    return render_template(
+        "movies.html",
+        board=movies.board(),
+        shows=series.board(),
+        results=None,
+        query="",
+        me=who_is_logged_in(),
+    )
 
 
 @app.post("/movies/add")
@@ -504,6 +510,77 @@ def movie_review_delete(review_id):
 @login_required
 def movie_delete(movie_id):
     movies.delete_movie(movie_id)
+    return redirect(url_for("movies_page"))
+
+
+# ---------- Series and episode tracker (Maryan and Mariah) ----------
+
+@app.get("/movies/series/search")
+@login_required
+def series_search():
+    query = request.args.get("title", "").strip()[:80]
+    if not query:
+        flash("Write the series name first.")
+        return redirect(url_for("movies_page"))
+    try:
+        results = series.search(query)
+    except series.LookupFailed:
+        flash("Couldn’t reach the TV database right now. Please try again in a moment.")
+        return redirect(url_for("movies_page"))
+    if not results:
+        flash(f"No series found for “{query}”. Try another spelling.")
+        return redirect(url_for("movies_page"))
+    return render_template(
+        "movies.html",
+        board=movies.board(),
+        shows=series.board(),
+        results=results,
+        query=query,
+        me=who_is_logged_in(),
+    )
+
+
+@app.post("/movies/series/add")
+@login_required
+def series_add():
+    error = series.add_show(request.form.get("tvmaze_id", ""), who_is_logged_in())
+    if error:
+        flash(error)
+    return redirect(url_for("movies_page"))
+
+
+@app.post("/movies/series/next/<show_id>")
+@login_required
+def series_next(show_id):
+    series.mark_next(show_id)
+    return redirect(url_for("movies_page"))
+
+
+@app.post("/movies/series/episode/<ep_id>")
+@login_required
+def series_toggle(ep_id):
+    series.toggle_episode(ep_id)
+    return redirect(url_for("movies_page"))
+
+
+@app.post("/movies/series/season/<show_id>/<int:season>/<mode>")
+@login_required
+def series_season(show_id, season, mode):
+    series.mark_season(show_id, season, mode == "watch")
+    return redirect(url_for("movies_page"))
+
+
+@app.post("/movies/series/refresh/<show_id>")
+@login_required
+def series_refresh(show_id):
+    flash(series.refresh_show(show_id))
+    return redirect(url_for("movies_page"))
+
+
+@app.post("/movies/series/delete/<show_id>")
+@login_required
+def series_delete(show_id):
+    series.delete_show(show_id)
     return redirect(url_for("movies_page"))
 
 
