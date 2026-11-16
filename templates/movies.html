@@ -16,11 +16,12 @@
 <main>
   <p class="who"><a href="{{ url_for('schedule_page') }}">Back to dashboard</a> · <a href="{{ url_for('logout') }}">Log out</a></p>
   <h1>Movies</h1>
-  <p class="sub">Movies to watch together, and what we thought of them.</p>
+  <p class="sub">Movies and series to watch together, and what we thought of them.</p>
 
   <form class="add" method="post" action="{{ url_for('movies_add') }}">
-    <input type="text" name="title" placeholder="Add a movie to watch" maxlength="120" autocomplete="off" required aria-label="Movie title">
-    <button type="submit" class="primary">Add</button>
+    <input type="text" name="title" value="{{ query }}" placeholder="Add a movie, or find a series" maxlength="120" autocomplete="off" required aria-label="Movie or series title">
+    <button type="submit" class="primary">Add movie</button>
+    <button type="submit" formmethod="get" formaction="{{ url_for('series_search') }}">Find series</button>
   </form>
 
   {% with messages = get_flashed_messages() %}
@@ -29,14 +30,113 @@
     {% endfor %}
   {% endwith %}
 
-  {% if board['todo'] or board['watched'] %}
-    <p class="progress">{{ board['todo_count'] }} to watch · {{ board['watched_count'] }} watched</p>
+  {% if results is not none %}
+    <section class="results" aria-label="Series results">
+      <h2>Pick the right series</h2>
+      <p class="panel-sub">Results for “{{ query }}”. Choose the one you mean, so the episodes are the right ones.</p>
+      <ul class="res-list">
+        {% for r in results %}
+          <li class="res">
+            {% if r['image'] %}<img src="{{ r['image'] }}" alt="" loading="lazy">{% else %}<div class="noimg" aria-hidden="true">🎞</div>{% endif %}
+            <div class="res-main">
+              <b>{{ r['title'] }}</b>
+              <small>{{ r['meta'] }}</small>
+            </div>
+            {% if r['added'] %}
+              <span class="chip">Already added</span>
+            {% else %}
+              <form class="inline" method="post" action="{{ url_for('series_add') }}">
+                <input type="hidden" name="tvmaze_id" value="{{ r['id'] }}">
+                <button type="submit" class="primary">Add</button>
+              </form>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+      <div class="bar"><a href="{{ url_for('movies_page') }}"><button type="button">Close results</button></a></div>
+    </section>
+  {% endif %}
+
+  {% if board['todo'] or board['watched'] or shows %}
+    <p class="progress">{{ board['todo_count'] }} movies to watch · {{ board['watched_count'] }} watched · {{ shows|length }} {{ 'series' if shows|length != 1 else 'series' }}</p>
   {% else %}
-    <p class="empty" style="text-align:center;margin-top:32px">No movies yet. Add the first one above.</p>
+    <p class="empty" style="text-align:center;margin-top:32px">Nothing here yet. Add a movie or find a series above.</p>
+  {% endif %}
+
+  {% if shows %}
+    <h2>Series</h2>
+    {% for s in shows %}
+      <section class="show">
+        <div class="film-head">
+          <div class="film-main">
+            <span class="film-title">{{ s['title'] }}</span>
+            <small class="film-avg">{{ s['meta'] }}</small>
+          </div>
+          {% if s['done'] %}<span class="chip done-chip">✓ {{ s['done_text'] }}</span>{% endif %}
+        </div>
+
+        <div class="pgs" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ s['percent'] }}"><span style="width: {{ s['percent'] }}%"></span></div>
+        <p class="pgs-text">{{ s['watched'] }} of {{ s['aired'] }} aired {{ 'episode' if s['aired'] == 1 else 'episodes' }} watched{% if s['upcoming'] %} · {{ s['upcoming'] }} still to come{% endif %}</p>
+
+        {% if s['next'] %}
+          <div class="next-up">
+            <div>
+              <small>Next up</small>
+              <b>{{ s['next']['code'] }} · {{ s['next']['name'] }}</b>
+            </div>
+            <form class="inline" method="post" action="{{ url_for('series_next', show_id=s['id']) }}">
+              <button type="submit" class="primary">✓ Watched</button>
+            </form>
+          </div>
+        {% endif %}
+
+        <details class="rv-toggle" id="sh-{{ s['id'] }}">
+          <summary>Episodes <span class="rv-count">{{ s['total'] }}</span></summary>
+          <div class="rv-body">
+            {% for se in s['seasons'] %}
+              <details class="season" id="se-{{ s['id'] }}-{{ se['number'] }}">
+                <summary>
+                  <span>Season {{ se['number'] }}</span>
+                  <span class="se-count">{{ se['watched'] }}/{{ se['aired'] }} watched{% if se['aired'] < se['total'] %} · {{ se['total'] }} total{% endif %}</span>
+                </summary>
+                <div class="se-body">
+                  {% if se['aired'] %}
+                    <form class="inline" method="post" action="{{ url_for('series_season', show_id=s['id'], season=se['number'], mode=('unwatch' if se['complete'] else 'watch')) }}">
+                      <button type="submit">{{ 'Mark season unwatched' if se['complete'] else 'Mark season watched' }}</button>
+                    </form>
+                  {% endif %}
+                  <ul class="eps">
+                    {% for e in se['episodes'] %}
+                      <li class="ep{{ ' done' if e['watched'] }}{{ ' soon' if not e['aired'] }}">
+                        <form class="inline" method="post" action="{{ url_for('series_toggle', ep_id=e['id']) }}">
+                          <button type="submit" class="ep-check" {{ 'disabled' if not e['aired'] }} aria-label="{{ 'Mark as not watched' if e['watched'] else 'Mark as watched' }}: {{ e['code'] }}">{% if e['watched'] %}✓{% endif %}</button>
+                        </form>
+                        <span class="ep-num">{{ e['number'] }}</span>
+                        <span class="ep-name">{{ e['name'] }}</span>
+                        <small class="ep-date">{{ e['when'] }}</small>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              </details>
+            {% endfor %}
+
+            <div class="show-tools">
+              <form class="inline" method="post" action="{{ url_for('series_refresh', show_id=s['id']) }}">
+                <button type="submit">Check for new episodes</button>
+              </form>
+              <form class="inline" method="post" action="{{ url_for('series_delete', show_id=s['id']) }}" onsubmit="return confirm('Remove this series and your progress?')">
+                <button type="submit" class="x">Remove series</button>
+              </form>
+            </div>
+          </div>
+        </details>
+      </section>
+    {% endfor %}
   {% endif %}
 
   {% if board['todo'] %}
-    <h2>To watch</h2>
+    <h2>Movies to watch</h2>
     <ul class="tasks">
       {% for m in board['todo'] %}
         <li class="task">
@@ -56,7 +156,7 @@
   {% endif %}
 
   {% if board['watched'] %}
-    <h2>Watched</h2>
+    <h2>Movies watched</h2>
     {% for m in board['watched'] %}
       <section class="film">
         <div class="film-head">
@@ -121,18 +221,22 @@
       </section>
     {% endfor %}
   {% endif %}
+
+  <p class="credit">Series and episode data from <a href="https://www.tvmaze.com" target="_blank" rel="noopener">TVmaze.com</a></p>
 </main>
 
 <script>
   // After ticking, saving or deleting, the page reloads. This keeps your place
-  // and re-opens the Reviews you had open, so a new review shows straight away.
-  document.addEventListener('submit', function () {
+  // and re-opens whatever you had open (Episodes, Seasons, Reviews).
+  document.addEventListener('submit', function (e) {
+    var how = (e.submitter && e.submitter.formMethod) || e.target.method;
+    if (how === 'get') return;
     try {
       sessionStorage.setItem('moviesY', String(window.scrollY));
       var open = [];
-      document.querySelectorAll('details.rv-toggle[open]').forEach(function (d) { open.push(d.id); });
+      document.querySelectorAll('details[id][open]').forEach(function (d) { open.push(d.id); });
       sessionStorage.setItem('moviesOpen', JSON.stringify(open));
-    } catch (e) {}
+    } catch (err) {}
   });
   try {
     var open = JSON.parse(sessionStorage.getItem('moviesOpen') || '[]');
@@ -147,7 +251,7 @@
       window.scrollTo(0, Number(y));
       sessionStorage.removeItem('moviesY');
     }
-  } catch (e) {}
+  } catch (err) {}
 </script>
 </body>
 </html>
