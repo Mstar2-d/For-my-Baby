@@ -2789,3 +2789,26 @@ textarea.rev-text:focus {
     min-height: 38px;
   }
 }
+
+/* ==========================================================================
+   21. TOP BAR ALIGNMENT
+   "Signed in as…" sits on the same line as the date above "Dashboard".
+   ========================================================================== */
+
+.topbar {
+  align-items: baseline;
+}
+
+.topbar .who {
+  align-self: auto;
+}
+
+@media (min-width: 900px) and (min-height: 560px) {
+  .topbar {
+    align-items: baseline;
+  }
+
+  .topbar .who {
+    align-self: auto;
+  }
+}

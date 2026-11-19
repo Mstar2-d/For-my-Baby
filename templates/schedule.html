@@ -12,10 +12,13 @@
 <main class="wide">
   <p class="who">Signed in as {{ me }} · <a href="{{ url_for('logout') }}">Log out</a></p>
 
-  <header class="hello">
-    <p class="eyebrow">{{ together['today_label'] }}</p>
-    <h1>Dashboard</h1>
-    <p class="sub" id="greet">Hello, {{ me }}. Here’s everything for the two of you.</p>
+    <header class="topbar">
+    <div class="hello">
+      <p class="eyebrow">{{ together['today_label'] }}</p>
+      <h1>Dashboard</h1>
+      <p class="sub" id="greet">Hello, {{ me }}. Here’s everything for the two of you.</p>
+    </div>
+    <p class="who">Signed in as {{ me }} · <a href="{{ url_for('logout') }}">Log out</a></p>
   </header>
 
   <nav class="tiles" aria-label="Sections">
