@@ -583,6 +583,25 @@ def series_delete(show_id):
     series.delete_show(show_id)
     return redirect(url_for("movies_page"))
 
+@app.post("/movies/series/review/<show_id>")
+@login_required
+def series_review(show_id):
+    error = series.add_review(
+        show_id,
+        who_is_logged_in(),
+        request.form.get("rating", ""),
+        request.form.get("comment", ""),
+    )
+    if error:
+        flash(error)
+    return redirect(url_for("movies_page"))
+
+
+@app.post("/movies/series/review/delete/<review_id>")
+@login_required
+def series_review_delete(review_id):
+    series.delete_review(review_id, who_is_logged_in())
+    return redirect(url_for("movies_page"))
 
 # ---------- Gallery (Maryan and Mariah) ----------
 

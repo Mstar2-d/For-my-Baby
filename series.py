@@ -1,9 +1,9 @@
 """The series and episode tracker on the Movies page.
 
 Series are looked up on TVmaze (a free TV database), so the seasons and the
-number of episodes are the real ones, not typed by hand. Series and episodes are
-saved in the same database as the letters (see db.py), in two tables:
-"series_shows" and "series_eps".
+number of episodes are the real ones, not typed by hand. Series, episodes and
+reviews are saved in the same database as the letters (see db.py), in three
+tables: "series_shows", "series_eps" and "series_reviews".
 """
 import json
 import logging
@@ -22,6 +22,7 @@ log = logging.getLogger(__name__)
 
 API = "https://api.tvmaze.com"
 SAFE_ID = re.compile(r"^[A-Za-z0-9]+$")
+MAX_COMMENT = 600
 
 
 class LookupFailed(Exception):
@@ -53,6 +54,16 @@ def _init():
                 name TEXT NOT NULL,
                 airdate TEXT NOT NULL,
                 watched INTEGER NOT NULL DEFAULT 0
+            )
+        """))
+        conn.execute(text("""
+            CREATE TABLE IF NOT EXISTS series_reviews (
+                id TEXT PRIMARY KEY,
+                show_id TEXT NOT NULL,
+                author TEXT NOT NULL,
+                rating INTEGER NOT NULL,
+                comment TEXT NOT NULL,
+                created TEXT NOT NULL
             )
         """))
 
@@ -93,6 +104,15 @@ def _pretty(iso):
     try:
         d = date.fromisoformat(iso)
         return f"{d.strftime('%b')} {d.day}, {d.year}"
+    except (TypeError, ValueError):
+        return ""
+
+
+def _stamp(iso):
+    """The date a review was written, like 'Nov 2, 2026'."""
+    try:
+        when = datetime.fromisoformat(iso)
+        return f"{when.strftime('%b')} {when.day}, {when.year}"
     except (TypeError, ValueError):
         return ""
 
@@ -151,7 +171,7 @@ def _fetch_show(tvmaze_id):
 # ---------- What main.py uses ----------
 
 def board():
-    """Every series with its seasons, episodes and progress."""
+    """Every series with its seasons, episodes, progress and reviews."""
     today = planner.today().isoformat()
     with engine.connect() as conn:
         shows = conn.execute(text(
@@ -161,10 +181,24 @@ def board():
             "SELECT id, show_id, season, number, name, airdate, watched "
             "FROM series_eps ORDER BY show_id, season, number"
         )).mappings().all()
+        reviews = conn.execute(text(
+            "SELECT id, show_id, author, rating, comment, created "
+            "FROM series_reviews ORDER BY created ASC"
+        )).mappings().all()
 
     by_show = {}
     for r in rows:
         by_show.setdefault(r["show_id"], []).append(r)
+
+    reviews_by_show = {}
+    for r in reviews:
+        reviews_by_show.setdefault(r["show_id"], []).append({
+            "id": r["id"],
+            "author": r["author"],
+            "rating": int(r["rating"]),
+            "comment": r["comment"],
+            "date": _stamp(r["created"]),
+        })
 
     result = []
     for s in shows:
@@ -209,6 +243,14 @@ def board():
                 "complete": s_aired > 0 and s_watched == s_aired,
             })
 
+        revs = reviews_by_show.get(s["id"], [])
+        avg_round = 0
+        avg_text = ""
+        if revs:
+            avg = sum(r["rating"] for r in revs) / len(revs)
+            avg_round = int(avg + 0.5)
+            avg_text = f"{avg:.1f}".removesuffix(".0")
+
         done = aired > 0 and watched == aired
         result.append({
             "id": s["id"],
@@ -223,6 +265,10 @@ def board():
             "done": done,
             "done_text": "Finished" if s["status"] == "Ended" else "Caught up",
             "seasons": season_list,
+            "reviews": revs,
+            "rv_count": len(revs),
+            "avg_round": avg_round,
+            "avg_text": avg_text,
         })
     return result
 
@@ -383,8 +429,56 @@ def mark_season(show_id, season, watched):
 
 
 def delete_show(show_id):
+    """Deletes the series, its episodes and every review written about it."""
     if not SAFE_ID.match(show_id):
         return
     with engine.begin() as conn:
+        conn.execute(text("DELETE FROM series_reviews WHERE show_id = :s"), {"s": show_id})
         conn.execute(text("DELETE FROM series_eps WHERE show_id = :s"), {"s": show_id})
         conn.execute(text("DELETE FROM series_shows WHERE id = :s"), {"s": show_id})
+
+
+# ---------- Reviews ----------
+
+def add_review(show_id, who, rating, comment):
+    """Adds one more review. Returns None when it worked, or a message saying what to fix."""
+    if not SAFE_ID.match(show_id):
+        return "That series couldn’t be found."
+    try:
+        stars = int(rating)
+    except (TypeError, ValueError):
+        stars = 0
+    if stars not in range(1, 6):
+        return "Pick a star rating first."
+    comment = comment.strip()[:MAX_COMMENT]
+
+    with engine.begin() as conn:
+        found = conn.execute(
+            text("SELECT 1 FROM series_shows WHERE id = :id"), {"id": show_id}
+        ).first()
+        if not found:
+            return "That series couldn’t be found."
+        conn.execute(
+            text("""INSERT INTO series_reviews (id, show_id, author, rating, comment, created)
+                    VALUES (:id, :show, :author, :rating, :comment, :created)"""),
+            {
+                "id": uuid.uuid4().hex,
+                "show": show_id,
+                "author": who,
+                "rating": stars,
+                "comment": comment,
+                "created": datetime.now(planner.TZ).isoformat(),
+            },
+        )
+    return None
+
+
+def delete_review(review_id, who):
+    """You can only delete your own reviews."""
+    if not SAFE_ID.match(review_id):
+        return
+    with engine.begin() as conn:
+        conn.execute(
+            text("DELETE FROM series_reviews WHERE id = :id AND author = :who"),
+            {"id": review_id, "who": who},
+        )

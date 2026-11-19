@@ -58,7 +58,7 @@
   {% endif %}
 
   {% if board['todo'] or board['watched'] or shows %}
-    <p class="progress">{{ board['todo_count'] }} movies to watch · {{ board['watched_count'] }} watched · {{ shows|length }} {{ 'series' if shows|length != 1 else 'series' }}</p>
+    <p class="progress">{{ board['todo_count'] }} movies to watch · {{ board['watched_count'] }} watched · {{ shows|length }} series</p>
   {% else %}
     <p class="empty" style="text-align:center;margin-top:32px">Nothing here yet. Add a movie or find a series above.</p>
   {% endif %}
@@ -71,6 +71,9 @@
           <div class="film-main">
             <span class="film-title">{{ s['title'] }}</span>
             <small class="film-avg">{{ s['meta'] }}</small>
+            <small class="film-avg">
+              {% if s['rv_count'] %}{{ stars(s['avg_round']) }} {{ s['avg_text'] }} · {{ s['rv_count'] }} {{ 'review' if s['rv_count'] == 1 else 'reviews' }}{% else %}No reviews yet{% endif %}
+            </small>
           </div>
           {% if s['done'] %}<span class="chip done-chip">✓ {{ s['done_text'] }}</span>{% endif %}
         </div>
@@ -125,10 +128,54 @@
               <form class="inline" method="post" action="{{ url_for('series_refresh', show_id=s['id']) }}">
                 <button type="submit">Check for new episodes</button>
               </form>
-              <form class="inline" method="post" action="{{ url_for('series_delete', show_id=s['id']) }}" onsubmit="return confirm('Remove this series and your progress?')">
+              <form class="inline" method="post" action="{{ url_for('series_delete', show_id=s['id']) }}" onsubmit="return confirm('Remove this series, your progress and its reviews?')">
                 <button type="submit" class="x">Remove series</button>
               </form>
             </div>
+          </div>
+        </details>
+
+        <details class="rv-toggle" id="sr-{{ s['id'] }}">
+          <summary>Reviews <span class="rv-count">{{ s['rv_count'] }}</span></summary>
+
+          <div class="rv-body">
+            {% if s['reviews'] %}
+              <ul class="rvlist">
+                {% for r in s['reviews'] %}
+                  <li class="rv">
+                    {{ stars(r['rating']) }}
+                    {% if r['comment'] %}<p class="rv-comment">{{ r['comment'] }}</p>{% endif %}
+                    <div class="rv-meta">
+                      <span><span class="chip {{ r['author']|lower }}">{{ r['author'] }}</span>{% if r['date'] %} · {{ r['date'] }}{% endif %}</span>
+                      {% if r['author'] == me %}
+                        <form class="inline" method="post" action="{{ url_for('series_review_delete', review_id=r['id']) }}" onsubmit="return confirm('Delete your review?')">
+                          <button type="submit" class="x" aria-label="Delete review">Delete</button>
+                        </form>
+                      {% endif %}
+                    </div>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <p class="empty">No reviews yet. Be the first.</p>
+            {% endif %}
+
+            <details class="rev-add">
+              <summary>＋ {{ 'Add another review' if s['reviews'] else 'Add a review' }}</summary>
+              <form class="rev-form" method="post" action="{{ url_for('series_review', show_id=s['id']) }}">
+                <p class="rev-as">Reviewing as {{ me }}</p>
+                <div class="rate" role="radiogroup" aria-label="Your rating">
+                  {% for i in [5, 4, 3, 2, 1] %}
+                    <input type="radio" name="rating" id="sr{{ s['id'] }}-{{ i }}" value="{{ i }}">
+                    <label for="sr{{ s['id'] }}-{{ i }}"><span class="sr">{{ i }} star{{ 's' if i > 1 }}</span>★</label>
+                  {% endfor %}
+                </div>
+                <textarea class="rev-text" name="comment" maxlength="600" placeholder="What did you think? (optional)" aria-label="Your review"></textarea>
+                <div class="btns">
+                  <button type="submit" class="primary">Save review</button>
+                </div>
+              </form>
+            </details>
           </div>
         </details>
       </section>
